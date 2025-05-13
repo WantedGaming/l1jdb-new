@@ -181,7 +181,10 @@ $model_result = $conn->query($model_sql);
                             'use_elf' => 'Elf',
                             'use_darkelf' => 'Dark Elf',
                             'use_dragonknight' => 'Dragon Knight',
-                            'use_illusionist' => 'Illusionist'
+                            'use_illusionist' => 'Illusionist',
+							'use_warrior' => 'Warrior',
+							'use_fencer' => 'Fencer',
+							'use_lancer' => 'Lancer'
                         ];
                         
                         $allowed_classes = [];

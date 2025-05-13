@@ -225,12 +225,15 @@ a:hover {
     position: relative;
 }
 
+.search-form .input-group {
+    flex-wrap: nowrap;
+}
+
 .search-form .form-control {
     background-color: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.1);
     font-size: 1.1rem;
     padding: 0.75rem 1.5rem;
-    border-radius: 2rem;
     color: var(--text);
     backdrop-filter: blur(4px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -245,14 +248,68 @@ a:hover {
     transform: translateY(-2px);
 }
 
+.search-form .search-input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+    border-top-left-radius: 2rem;
+    border-bottom-left-radius: 2rem;
+}
+
+.search-form .weapon-type-select {
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text);
+    max-width: 200px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    transition: var(--hover-transition);
+}
+
+.search-form .weapon-type-select:focus {
+    background-color: rgba(255, 255, 255, 0.12);
+    border-color: var(--accent);
+    box-shadow: 0 4px 20px rgba(249, 75, 31, 0.2);
+    color: var(--text);
+}
+
+.search-form .weapon-type-select option {
+    background-color: var(--primary);
+    color: var(--text);
+    padding: 10px;
+}
+
 .search-form .btn-accent {
     padding: 0.75rem 1.8rem;
-    border-radius: 2rem;
+    border-top-right-radius: 2rem;
+    border-bottom-right-radius: 2rem;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
     font-weight: 600;
-    position: absolute;
-    right: 4px;
-    top: 4px;
-    bottom: 4px;
+}
+
+/* Custom search form layout for better responsiveness */
+@media (max-width: 768px) {
+    .search-form .input-group {
+        flex-direction: column;
+    }
+    
+    .search-form .form-control.search-input,
+    .search-form .weapon-type-select,
+    .search-form .btn-accent {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 10px;
+        border-radius: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .search-form .btn-accent {
+        position: relative;
+        right: 0;
+        top: 0;
+    }
 }
 
 /* ====== CARDS ====== */

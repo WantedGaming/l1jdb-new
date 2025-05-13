@@ -64,8 +64,8 @@ function getPaginationUrl($page) {
             <!-- Search Form -->
             <form class="search-form mt-4" method="GET" action="">
                 <div class="input-group">
-                    <input type="text" class="form-control" name="search" placeholder="Search weapons..." value="<?php echo htmlspecialchars($search); ?>">
-                    <select class="form-control" name="type" style="max-width: 200px; border-radius: 0;">
+                    <input type="text" class="form-control search-input" name="search" placeholder="Search weapons..." value="<?php echo htmlspecialchars($search); ?>">
+                    <select class="form-control weapon-type-select" name="type">
                         <option value="">All Types</option>
                         <option value="SWORD" <?php echo ($type == 'SWORD') ? 'selected' : ''; ?>>Sword</option>
                         <option value="DAGGER" <?php echo ($type == 'DAGGER') ? 'selected' : ''; ?>>Dagger</option>

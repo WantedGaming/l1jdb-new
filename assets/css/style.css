@@ -1,0 +1,136 @@
+:root {
+    --text: #ffffff;
+    --background: #030303;
+    --primary: #080808;
+    --secondary: #0a0a0a;
+    --accent: #f94b1f;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--text);
+    font-family: 'Arial', sans-serif;
+}
+
+.card {
+    background-color: var(--primary);
+    border: 1px solid var(--secondary);
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    background-color: var(--secondary);
+    color: var(--text);
+}
+
+.card-img-top {
+    height: 180px;
+    object-fit: cover;
+}
+
+.btn-accent {
+    background-color: var(--accent);
+    color: var(--text);
+    border: none;
+}
+
+.btn-accent:hover {
+    background-color: #d93f18;
+    color: var(--text);
+}
+
+.hero-section {
+    background-color: var(--primary);
+    padding: 4rem 0;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--secondary);
+}
+
+.navbar {
+    background-color: var(--primary);
+    border-bottom: 1px solid var(--secondary);
+}
+
+.dropdown-menu {
+    background-color: var(--primary);
+    border: 1px solid var(--secondary);
+}
+
+.dropdown-item {
+    color: var(--text);
+}
+
+.dropdown-item:hover {
+    background-color: var(--secondary);
+    color: var(--text);
+}
+
+/* Admin dashboard specific styles */
+.admin-header {
+    background-color: var(--primary);
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+}
+
+.admin-card {
+    height: 100%;
+}
+
+.admin-card .card-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-card .btn {
+    margin-top: auto;
+    margin-right: 5px;
+}
+
+.form-control {
+    background-color: var(--secondary);
+    border: 1px solid #222;
+    color: var(--text);
+}
+
+.form-control:focus {
+    background-color: var(--secondary);
+    color: var(--text);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 0.25rem rgba(249, 75, 31, 0.25);
+}
+
+/* Category detail styles */
+.detail-header {
+    background-color: var(--primary);
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
+
+.table {
+    color: var(--text);
+    border-color: var(--secondary);
+}
+
+.table th {
+    background-color: var(--secondary);
+}
+
+.pagination .page-link {
+    background-color: var(--primary);
+    color: var(--text);
+    border-color: var(--secondary);
+}
+
+.pagination .page-link:hover {
+    background-color: var(--secondary);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}

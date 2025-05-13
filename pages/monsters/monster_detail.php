@@ -68,7 +68,7 @@ $monster = $result->fetch_assoc();
                     <h5>Basic Stats</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
+                    <div class="row mb-4">
                         <div class="col-md-6">
                             <table class="table">
                                 <tbody>
@@ -81,18 +81,6 @@ $monster = $result->fetch_assoc();
                                         <td><?php echo $monster['lvl']; ?></td>
                                     </tr>
                                     <tr>
-                                        <th class="stat-label">HP</th>
-                                        <td><?php echo $monster['hp']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">MP</th>
-                                        <td><?php echo $monster['mp']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">AC</th>
-                                        <td><?php echo $monster['ac']; ?></td>
-                                    </tr>
-                                    <tr>
                                         <th class="stat-label">EXP</th>
                                         <td><?php echo $monster['exp']; ?></td>
                                     </tr>
@@ -100,16 +88,16 @@ $monster = $result->fetch_assoc();
                                         <th class="stat-label">Alignment</th>
                                         <td><?php echo $monster['alignment']; ?></td>
                                     </tr>
-                                    <tr>
-                                        <th class="stat-label">Size</th>
-                                        <td><?php echo $monster['big'] == 'true' ? 'Large' : 'Normal'; ?></td>
-                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="col-md-6">
                             <table class="table">
                                 <tbody>
+                                    <tr>
+                                        <th class="stat-label">Size</th>
+                                        <td><?php echo $monster['big'] == 'true' ? 'Large' : 'Normal'; ?></td>
+                                    </tr>
                                     <tr>
                                         <th class="stat-label">Family</th>
                                         <td><?php echo !empty($monster['family']) ? $monster['family'] : 'None'; ?></td>
@@ -122,28 +110,54 @@ $monster = $result->fetch_assoc();
                                         <th class="stat-label">Weakness</th>
                                         <td><?php echo $monster['weakAttr']; ?></td>
                                     </tr>
-                                    <tr>
-                                        <th class="stat-label">Is Boss</th>
-                                        <td><?php echo $monster['is_bossmonster'] == 'true' ? 'Yes' : 'No'; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">Tameable</th>
-                                        <td><?php echo $monster['is_taming'] == 'true' ? 'Yes' : 'No'; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">Aggressive</th>
-                                        <td><?php echo $monster['is_agro'] == 'true' ? 'Yes' : 'No'; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">Teleport</th>
-                                        <td><?php echo $monster['is_teleport'] == 'true' ? 'Yes' : 'No'; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">Picks Up Items</th>
-                                        <td><?php echo $monster['is_picupitem'] == 'true' ? 'Yes' : 'No'; ?></td>
-                                    </tr>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Stat Buttons -->
+                    <div class="text-center mb-2">
+                        <div class="btn-group btn-group-lg" role="group" aria-label="Stat Buttons">
+                            <button type="button" class="btn btn-outline-light stat-btn" data-stat="hp">
+                                <span>HP</span>
+                                <span class="d-block"><?php echo $monster['hp']; ?></span>
+                            </button>
+                            <button type="button" class="btn btn-outline-light stat-btn" data-stat="mp">
+                                <span>MP</span>
+                                <span class="d-block"><?php echo $monster['mp']; ?></span>
+                            </button>
+                            <button type="button" class="btn btn-outline-light stat-btn" data-stat="ac">
+                                <span>AC</span>
+                                <span class="d-block"><?php echo $monster['ac']; ?></span>
+                            </button>
+							<button type="button" class="btn btn-outline-light stat-btn" data-stat="mr">
+                                <span>MR</span>
+                                <span class="d-block"><?php echo $monster['mr']; ?></span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="btn-group btn-group-lg" role="group" aria-label="Attribute Buttons">
+                            <button type="button" class="btn btn-outline-light stat-btn" data-stat="str">
+                                <span>STR</span>
+                                <span class="d-block"><?php echo $monster['str']; ?></span>
+                            </button>
+                            <button type="button" class="btn btn-outline-light stat-btn" data-stat="dex">
+                                <span>DEX</span>
+                                <span class="d-block"><?php echo $monster['dex']; ?></span>
+                            </button>
+                            <button type="button" class="btn btn-outline-light stat-btn" data-stat="con">
+                                <span>CON</span>
+                                <span class="d-block"><?php echo $monster['con']; ?></span>
+                            </button>
+                            <button type="button" class="btn btn-outline-light stat-btn" data-stat="wis">
+                                <span>WIS</span>
+                                <span class="d-block"><?php echo $monster['wis']; ?></span>
+                            </button>
+                            <button type="button" class="btn btn-outline-light stat-btn" data-stat="int">
+                                <span>INT</span>
+                                <span class="d-block"><?php echo $monster['intel']; ?></span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -152,147 +166,214 @@ $monster = $result->fetch_assoc();
     </div>
     
     <div class="row">
-        <!-- Stats -->
-        <div class="col-md-6 mb-4">
+        <!-- Attributes -->
+        <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-header">
                     <h5>Attributes</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <table class="table">
-                                <tbody>
-                                    <tr>
-                                        <th class="stat-label">STR</th>
-                                        <td><?php echo $monster['str']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">DEX</th>
-                                        <td><?php echo $monster['dex']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">CON</th>
-                                        <td><?php echo $monster['con']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">WIS</th>
-                                        <td><?php echo $monster['wis']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">INT</th>
-                                        <td><?php echo $monster['intel']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">MR</th>
-                                        <td><?php echo $monster['mr']; ?></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <table class="table">
-                                <tbody>
-                                    <tr>
-                                        <th class="stat-label">Passive Speed</th>
-                                        <td><?php echo $monster['passispeed']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">Attack Speed</th>
-                                        <td><?php echo $monster['atkspeed']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">Magic Speed</th>
-                                        <td><?php echo $monster['atk_magic_speed']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">Ranged</th>
-                                        <td><?php echo $monster['ranged']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">Damage Reduction</th>
-                                        <td><?php echo $monster['damage_reduction']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">Hard</th>
-                                        <td><?php echo $monster['is_hard'] == 'true' ? 'Yes' : 'No'; ?></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th class="stat-label">HP Regen</th>
+                                <td><?php echo $monster['hpr']; ?> (<?php echo $monster['hprinterval']; ?> ms)</td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">MP Regen</th>
+                                <td><?php echo $monster['mpr']; ?> (<?php echo $monster['mprinterval']; ?> ms)</td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">Passive Speed</th>
+                                <td><?php echo $monster['passispeed']; ?></td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">Attack Speed</th>
+                                <td><?php echo $monster['atkspeed']; ?></td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">Magic Speed</th>
+                                <td><?php echo $monster['atk_magic_speed']; ?></td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">Ranged</th>
+                                <td><?php echo $monster['ranged']; ?></td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">Damage Reduction</th>
+                                <td><?php echo $monster['damage_reduction']; ?></td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">Hard</th>
+                                <td><?php echo $monster['is_hard'] == 'true' ? 'Yes' : 'No'; ?></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
         
-        <!-- Special Abilities -->
-        <div class="col-md-6 mb-4">
+        <!-- Aggressive Behavior -->
+        <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-header">
-                    <h5>Special Abilities</h5>
+                    <h5>Behavior</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <table class="table">
-                                <tbody>
-                                    <tr>
-                                        <th class="stat-label">Poison Attack</th>
-                                        <td><?php echo $monster['poison_atk']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">Aggro Invis</th>
-                                        <td><?php echo $monster['is_agro_invis'] == 'true' ? 'Yes' : 'No'; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">Aggro Poly</th>
-                                        <td><?php echo $monster['is_agro_poly'] == 'true' ? 'Yes' : 'No'; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">Brave Speed</th>
-                                        <td><?php echo $monster['is_bravespeed'] == 'true' ? 'Yes' : 'No'; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">Digestible</th>
-                                        <td><?php echo $monster['digestitem'] > 0 ? 'Yes' : 'No'; ?></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <table class="table">
-                                <tbody>
-                                    <tr>
-                                        <th class="stat-label">HP Regen</th>
-                                        <td><?php echo $monster['hpr']; ?> (<?php echo $monster['hprinterval']; ?> ms)</td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">MP Regen</th>
-                                        <td><?php echo $monster['mpr']; ?> (<?php echo $monster['mprinterval']; ?> ms)</td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">Random Level</th>
-                                        <td><?php echo $monster['randomlevel']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">Can be Resurrected</th>
-                                        <td><?php echo $monster['cant_resurrect'] == 'false' ? 'Yes' : 'No'; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="stat-label">Can be Turn Undead</th>
-                                        <td><?php echo $monster['can_turnundead'] == 'true' ? 'Yes' : 'No'; ?></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th class="stat-label">Aggressive</th>
+                                <td>
+                                    <?php if ($monster['is_agro'] == 'true'): ?>
+                                        <span class="badge bg-danger">Yes</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">No</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">Poly Aggressive</th>
+                                <td>
+                                    <?php if ($monster['is_agro_poly'] == 'true'): ?>
+                                        <span class="badge bg-danger">Yes</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">No</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">Invis Aggressive</th>
+                                <td>
+                                    <?php if ($monster['is_agro_invis'] == 'true'): ?>
+                                        <span class="badge bg-danger">Yes</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">No</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">Agro Family</th>
+                                <td><?php echo $monster['agrofamily']; ?></td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">Poison Attack</th>
+                                <td>
+                                    <?php if ($monster['poison_atk'] != 'NONE'): ?>
+                                        <span class="badge bg-danger"><?php echo $monster['poison_atk']; ?></span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">None</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">Boss Status</th>
+                                <td>
+                                    <?php if ($monster['is_bossmonster'] == 'true'): ?>
+                                        <span class="badge bg-accent">Boss</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">Normal</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Habits -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Abilities</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th class="stat-label">Loots Items</th>
+                                <td>
+                                    <?php if ($monster['is_picupitem'] == 'true'): ?>
+                                        <span class="badge bg-accent">Yes</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">No</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">Eats Items</th>
+                                <td>
+                                    <?php if ($monster['digestitem'] > 0): ?>
+                                        <span class="badge bg-accent">Yes (<?php echo $monster['digestitem']; ?>)</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">No</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">Uses Haste</th>
+                                <td>
+                                    <?php if ($monster['is_bravespeed'] == 'true'): ?>
+                                        <span class="badge bg-accent">Yes</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">No</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">Tameable</th>
+                                <td>
+                                    <?php if ($monster['is_taming'] == 'true'): ?>
+                                        <span class="badge bg-accent">Yes</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">No</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">Turn Undead</th>
+                                <td>
+                                    <?php if ($monster['can_turnundead'] == 'true'): ?>
+                                        <span class="badge bg-accent">Yes</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">No</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">Teleports</th>
+                                <td>
+                                    <?php if ($monster['is_teleport'] == 'true'): ?>
+                                        <span class="badge bg-accent">Yes</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">No</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">Can be Resurrected</th>
+                                <td>
+                                    <?php if ($monster['cant_resurrect'] == 'false'): ?>
+                                        <span class="badge bg-accent">Yes</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">No</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="stat-label">Random Level</th>
+                                <td><?php echo $monster['randomlevel'] > 0 ? $monster['randomlevel'] : 'No'; ?></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
     
     <div class="text-center mt-4 mb-5">
-        <a href="monster_list.php" class="btn btn-outline-light"><i class="fas fa-arrow-left mr-2"></i> Back to Monster List</a>
+        <a href="monsters_list.php" class="btn btn-outline-light"><i class="fas fa-arrow-left mr-2"></i> Back to Monster List</a>
     </div>
 </section>
 

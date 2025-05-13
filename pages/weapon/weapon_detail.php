@@ -166,48 +166,61 @@ $model_result = $conn->query($model_sql);
     
     <div class="row">
         <!-- Class Restrictions - Only allowed classes -->
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Class Restrictions</h5>
-                </div>
-                <div class="card-body">
-                    <div class="allowed-classes">
-                        <?php
-                        $class_restrictions = [
-                            'use_royal' => 'Royal',
-                            'use_knight' => 'Knight',
-                            'use_mage' => 'Mage',
-                            'use_elf' => 'Elf',
-                            'use_darkelf' => 'Dark Elf',
-                            'use_dragonknight' => 'Dragon Knight',
-                            'use_illusionist' => 'Illusionist',
-							'use_warrior' => 'Warrior',
-							'use_fencer' => 'Fencer',
-							'use_lancer' => 'Lancer'
-                        ];
-                        
-                        $allowed_classes = [];
-                        foreach ($class_restrictions as $field => $class_name) {
-                            if ($weapon[$field]) {
-                                $allowed_classes[] = $class_name;
-                            }
-                        }
-                        
-                        if (count($allowed_classes) > 0) {
-                            echo '<ul class="class-list">';
-                            foreach ($allowed_classes as $class) {
-                                echo '<li><span class="badge bg-accent">' . $class . '</span></li>';
-                            }
-                            echo '</ul>';
-                        } else {
-                            echo '<p>No class can use this weapon.</p>';
-                        }
-                        ?>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Class Restrictions with Icons - Only allowed classes -->
+	<div class="col-md-6 mb-4">
+		<div class="card">
+			<div class="card-header">
+				<h5>Class Restrictions</h5>
+			</div>
+			<div class="card-body">
+				<div class="allowed-classes">
+					<?php
+					$class_restrictions = [
+						'use_royal' => 'Royal',
+						'use_knight' => 'Knight',
+						'use_mage' => 'Mage',
+						'use_elf' => 'Elf',
+						'use_darkelf' => 'Dark Elf',
+						'use_dragonknight' => 'Dragon Knight',
+						'use_illusionist' => 'Illusionist',
+						'use_warrior' => 'Warrior',
+						'use_fencer' => 'Fencer',
+						'use_lancer' => 'Lancer'
+					];
+					
+					$allowed_classes = [];
+					foreach ($class_restrictions as $field => $class_name) {
+						if ($weapon[$field]) {
+							$allowed_classes[] = $class_name;
+						}
+					}
+					
+					if (count($allowed_classes) > 0) {
+						echo '<ul class="class-list">';
+						foreach ($allowed_classes as $class) {
+							// Convert class name to lowercase and remove spaces for image filename
+							$class_img = strtolower(str_replace(' ', '', $class));
+							
+							echo '<li>';
+							echo '<div class="class-item">';
+							// Add the class image with fallback
+							echo '<img src="/l1jdb-new/assets/img/placeholders/class/details/' . $class_img . '.png" 
+									alt="' . $class . '" 
+									class="class-icon"
+									onerror="this.src=\'/assets/img/placeholders/class.png\'">';
+							echo '<span class="badge bg-accent">' . $class . '</span>';
+							echo '</div>';
+							echo '</li>';
+						}
+						echo '</ul>';
+					} else {
+						echo '<p>No class can use this weapon.</p>';
+					}
+					?>
+				</div>
+			</div>
+		</div>
+	</div>
         
         <!-- Stat Bonuses -->
         <div class="col-md-6 mb-4">

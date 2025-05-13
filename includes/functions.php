@@ -26,7 +26,7 @@ function getCategories() {
 
 // Function to get category image
 function getCategoryImage($category) {
-    return "assets/img/placeholders/{$category}.jpg";
+    return "assets/img/placeholders/{$category}.png";
 }
 
 // Function to get category description

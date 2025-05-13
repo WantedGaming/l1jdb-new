@@ -18,68 +18,90 @@
     </div>
 </section>
 
-<!-- Stats Overview -->
+<!-- Enhanced Stats Overview -->
 <section class="py-5">
     <div class="container">
         <div class="row">
-            <div class="col-md-3 mb-4">
-                <div class="admin-stats-card">
-                    <div class="stats-icon">
-                        <i class="fas fa-sword"></i>
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">User Accounts</h5>
+                        <i class="fas fa-user-circle" style="color: var(--accent);"></i>
                     </div>
-                    <div class="stats-number">
-                        <?php
-                        $result = $conn->query("SELECT COUNT(*) as count FROM weapon");
-                        $row = $result->fetch_assoc();
-                        echo number_format($row['count']);
-                        ?>
+                    <div class="card-body d-flex flex-column" style="min-height: 240px;">
+                        <?php $accountMetrics = getAccountMetrics(); ?>
+                        <div class="row mb-auto">
+                            <div class="col-6 mb-3">
+                                <div class="small text-white-50">Total Accounts</div>
+                                <div class="h4"><?=number_format($accountMetrics['total'])?></div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="small text-white-50">Active Today</div>
+                                <div class="h4"><?=number_format($accountMetrics['active'])?></div>
+                            </div>
+                            <div class="col-6">
+                                <div class="small text-white-50">Banned Accounts</div>
+                                <div class="h4"><?=number_format($accountMetrics['banned'])?></div>
+                            </div>
+                            <div class="col-6">
+                                <div class="small text-white-50">New Today</div>
+                                <div class="h4">+<?=number_format($accountMetrics['newToday'])?></div>
+                            </div>
+                        </div>
+                        <a href="accounts.php" class="btn btn-sm btn-accent w-100 mt-3">View Account Details</a>
                     </div>
-                    <div class="stats-label">Weapons</div>
                 </div>
             </div>
-            <div class="col-md-3 mb-4">
-                <div class="admin-stats-card">
-                    <div class="stats-icon">
-                        <i class="fas fa-shield"></i>
+
+            <!-- Server Stats -->
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Server Status</h5>
+                        <i class="fas fa-server" style="color: var(--accent);"></i>
                     </div>
-                    <div class="stats-number">
-                        <?php
-                        $result = $conn->query("SELECT COUNT(*) as count FROM armor");
-                        $row = $result->fetch_assoc();
-                        echo number_format($row['count']);
-                        ?>
+                    <div class="card-body d-flex flex-column" style="min-height: 240px;">
+                        <?php $serverMetrics = getServerMetrics(); ?>
+                        <div class="row mb-auto">
+                            <div class="col-6 mb-3">
+                                <div class="small text-white-50">Uptime</div>
+                                <div class="h4"><?=$serverMetrics['uptime']?></div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="small text-white-50">Peak Players</div>
+                                <div class="h4"><?=number_format($serverMetrics['peakPlayers'])?></div>
+                            </div>
+                            <div class="col-6">
+                                <div class="small text-white-50">Memory Usage</div>
+                                <div class="h4"><?=$serverMetrics['memoryUsage']?></div>
+                            </div>
+                        </div>
+                        <a href="server_logs.php" class="btn btn-sm btn-accent w-100 mt-3">View Server Logs</a>
                     </div>
-                    <div class="stats-label">Armor Items</div>
                 </div>
             </div>
-            <div class="col-md-3 mb-4">
-                <div class="admin-stats-card">
-                    <div class="stats-icon">
-                        <i class="fas fa-dragon"></i>
+
+            <!-- Economy Stats -->
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Economy Status</h5>
+                        <i class="fas fa-dollar-sign" style="color: var(--accent);"></i>
                     </div>
-                    <div class="stats-number">
-                        <?php
-                        $result = $conn->query("SELECT COUNT(*) as count FROM npc");
-                        $row = $result->fetch_assoc();
-                        echo number_format($row['count']);
-                        ?>
+                    <div class="card-body d-flex flex-column" style="min-height: 240px;">
+                        <?php $economyMetrics = getEconomyMetrics(); ?>
+                        <div class="row mb-auto">
+                            <div class="col-6 mb-3">
+                                <div class="small text-white-50">Adena Circulation</div>
+                                <div class="h4"><?=number_format($economyMetrics['adenaInCirculation']/1000000, 1)?>M</div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="small text-white-50">Transactions</div>
+                                <div class="h4"><?=number_format($economyMetrics['itemTransactions'])?></div>
+                            </div>
+                        </div>
+                        <a href="economy.php" class="btn btn-sm btn-accent w-100 mt-3">View Economy Report</a>
                     </div>
-                    <div class="stats-label">NPCs & Monsters</div>
-                </div>
-            </div>
-            <div class="col-md-3 mb-4">
-                <div class="admin-stats-card">
-                    <div class="stats-icon">
-                        <i class="fas fa-magic"></i>
-                    </div>
-                    <div class="stats-number">
-                        <?php
-                        $result = $conn->query("SELECT COUNT(*) as count FROM skills");
-                        $row = $result->fetch_assoc();
-                        echo number_format($row['count']);
-                        ?>
-                    </div>
-                    <div class="stats-label">Skills</div>
                 </div>
             </div>
         </div>
@@ -139,6 +161,49 @@
     </div>
 </section>
 
+<!-- Security Section -->
+<section class="py-4">
+    <div class="container">
+        <h2 class="section-title mb-4">Security</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Banned IPs</h5>
+                        <i class="fas fa-shield-alt" style="color: var(--accent);"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>IP Address</th>
+                                        <th>Reason</th>
+                                        <th>Ban Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach(getBannedIPs() as $ip): ?>
+                                    <tr>
+                                        <td><?=$ip['address']?></td>
+                                        <td><span class="badge bg-danger"><?=$ip['reason']?></span></td>
+                                        <td><?=$ip['registTime']?></td>
+                                        <td>
+                                            <a href="unban_ip.php?ip=<?=$ip['address']?>" class="btn btn-sm btn-outline-light">Unban</a>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Admin Categories -->
 <section class="py-5">
     <div class="container">
@@ -171,60 +236,32 @@
     </div>
 </section>
 
-<!-- Recent Activity -->
-<section class="py-5" style="background-color: var(--primary);">
+<!-- Recent Transactions -->
+<section class="py-4">
     <div class="container">
-        <h2 class="section-title mb-4">Recent Activity</h2>
-        
+        <h2 class="section-title mb-4">Recent Transactions</h2>
         <div class="card">
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>Action</th>
-                            <th>Table</th>
-                            <th>Item</th>
+                            <th>Type</th>
                             <th>User</th>
+                            <th>Item</th>
+                            <th>Amount</th>
                             <th>Time</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- This would be populated from a database table that tracks admin actions -->
+                        <?php foreach(getRecentTransactions() as $tx): ?>
                         <tr>
-                            <td><span class="badge bg-success">Added</span></td>
-                            <td>weapons</td>
-                            <td>Mythril Sword</td>
-                            <td>admin</td>
-                            <td><?php echo date('Y-m-d H:i', time() - 3600); ?></td>
+                            <td><span class="badge bg-accent"><?=$tx['type']?></span></td>
+                            <td><?=$tx['user']?></td>
+                            <td><?=$tx['item']?></td>
+                            <td><?=number_format($tx['amount'])?></td>
+                            <td><?=$tx['time']?></td>
                         </tr>
-                        <tr>
-                            <td><span class="badge bg-warning">Updated</span></td>
-                            <td>armor</td>
-                            <td>Dragon Scale Armor</td>
-                            <td>admin</td>
-                            <td><?php echo date('Y-m-d H:i', time() - 7200); ?></td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge bg-danger">Deleted</span></td>
-                            <td>items</td>
-                            <td>Damaged Potion</td>
-                            <td>admin</td>
-                            <td><?php echo date('Y-m-d H:i', time() - 10800); ?></td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge bg-accent">Viewed</span></td>
-                            <td>monsters</td>
-                            <td>Ancient Dragon</td>
-                            <td>admin</td>
-                            <td><?php echo date('Y-m-d H:i', time() - 14400); ?></td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge bg-success">Added</span></td>
-                            <td>skills</td>
-                            <td>Flame Strike</td>
-                            <td>admin</td>
-                            <td><?php echo date('Y-m-d H:i', time() - 18000); ?></td>
-                        </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>

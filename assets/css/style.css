@@ -220,10 +220,12 @@ body {
     padding: 1.5rem;
 }
 
+/* Updated Card Image Styles */
 .card-img-top {
-    height: 200px;
-    object-fit: cover;
-    filter: brightness(0.85);
+    height: 180px;
+    object-fit: contain; /* Changed from 'cover' to 'contain' */
+    background-color: rgba(5, 5, 5, 0.8); /* Dark background for transparent images */
+    padding: 1rem; /* Add some padding around the image */
     transition: var(--hover-transition);
 }
 

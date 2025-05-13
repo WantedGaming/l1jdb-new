@@ -1,5 +1,6 @@
 <?php require_once '../includes/config.php'; ?>
 <?php require_once '../includes/functions.php'; ?>
+<?php require_once '../includes/admin_functions.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

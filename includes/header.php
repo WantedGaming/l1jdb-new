@@ -18,19 +18,20 @@
     
     <!-- Custom CSS -->
 	<link href="<?php echo $_SERVER['DOCUMENT_ROOT'] ? '/' : ''; ?>l1jdb-new/assets/css/style.css" rel="stylesheet">
+	<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/l1jdb-new/includes/enhancement-loader.php'; ?>
 </head>
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="index.php">L1J <span>Remastered</span> DB</a>
+            <a class="navbar-brand" href="/l1jdb-new/index.php">L1J <span>Remastered</span> DB</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.php">Home</a>
+                        <a class="nav-link active" aria-current="page" href="/l1jdb-new/index.php">Home</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -38,12 +39,12 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <?php foreach(getCategories() as $category): ?>
-                                <li><a class="dropdown-item" href="<?php echo $category['id']; ?>/list.php"><?php echo $category['name']; ?></a></li>
+                                <li><a class="dropdown-item" href="/l1jdb-new/<?php echo $category['id']; ?>_list.php"><?php echo $category['name']; ?></a></li>
                             <?php endforeach; ?>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="admin/">Admin</a>
+                        <a class="nav-link" href="/l1jdb-new/admin/index.php">Admin</a>
                     </li>
                 </ul>
             </div>

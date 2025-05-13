@@ -1,3 +1,9 @@
+/* 
+ * L1J Remastered Database - Main Stylesheet
+ * Merged from style.css and enhanced-style.css
+ */
+
+/* ====== VARIABLES ====== */
 :root {
     --text: #ffffff;
     --background: #030303;
@@ -9,7 +15,16 @@
     --hover-transition: all 0.3s ease;
 }
 
-/* Override default link colors */
+/* ====== GLOBAL STYLES ====== */
+
+body {
+    background-color: var(--background);
+    color: var(--text);
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+}
+
+/* Links */
 a {
     color: var(--text);
     text-decoration: none;
@@ -31,14 +46,62 @@ a:hover {
     color: var(--accent) !important;
 }
 
-body {
-    background-color: var(--background);
-    color: var(--text);
-    font-family: 'Poppins', sans-serif;
-    line-height: 1.6;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-/* Modern Navbar */
+::-webkit-scrollbar-track {
+  background: var(--primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #fa6831;
+}
+
+/* Utility classes */
+.fancy-border {
+  border: 1px solid rgba(249, 75, 31, 0.3);
+  box-shadow: 0 0 10px rgba(249, 75, 31, 0.1);
+}
+
+.fancy-text {
+  text-shadow: 0 0 5px rgba(249, 75, 31, 0.3);
+}
+
+.depth-effect {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Fade-in animation for page content */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.container {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(249, 75, 31, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(249, 75, 31, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(249, 75, 31, 0); }
+}
+
+.highlight-pulse {
+  animation: pulse 2s infinite;
+}
+
+/* ====== NAVBAR ====== */
+
 .navbar {
     background-color: rgba(8, 8, 8, 0.95);
     backdrop-filter: blur(10px);
@@ -105,7 +168,8 @@ body {
     transform: translateX(5px);
 }
 
-/* Modern Hero Section */
+/* ====== HERO SECTION ====== */
+
 .hero-section {
     background: linear-gradient(to bottom, var(--primary), var(--background));
     position: relative;
@@ -153,7 +217,8 @@ body {
     opacity: 0.9;
 }
 
-/* Modern Search Form */
+/* ====== SEARCH FORM ====== */
+
 .search-form {
     max-width: 600px;
     margin: 0 auto;
@@ -177,6 +242,7 @@ body {
     border-color: var(--accent);
     box-shadow: 0 4px 20px rgba(249, 75, 31, 0.2);
     color: var(--text);
+    transform: translateY(-2px);
 }
 
 .search-form .btn-accent {
@@ -189,14 +255,15 @@ body {
     bottom: 4px;
 }
 
-/* Modern Card Styles */
+/* ====== CARDS ====== */
+
 .card {
     background: linear-gradient(to bottom right, rgba(15, 15, 15, 0.95), rgba(5, 5, 5, 0.95));
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 1rem;
     overflow: hidden;
     box-shadow: var(--card-shadow);
-    transition: var(--hover-transition);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     height: 100%;
 }
 
@@ -220,12 +287,11 @@ body {
     padding: 1.5rem;
 }
 
-/* Updated Card Image Styles */
 .card-img-top {
     height: 180px;
-    object-fit: contain; /* Changed from 'cover' to 'contain' */
-    background-color: rgba(5, 5, 5, 0.8); /* Dark background for transparent images */
-    padding: 1rem; /* Add some padding around the image */
+    object-fit: contain;
+    background-color: rgba(5, 5, 5, 0.8);
+    padding: 1rem;
     transition: var(--hover-transition);
 }
 
@@ -244,7 +310,8 @@ body {
     margin-bottom: 1.25rem;
 }
 
-/* Modern Button */
+/* ====== BUTTONS ====== */
+
 .btn {
     border-radius: 0.5rem;
     padding: 0.6rem 1.5rem;
@@ -257,6 +324,8 @@ body {
     color: var(--text);
     border: none;
     box-shadow: 0 4px 15px rgba(249, 75, 31, 0.3);
+    position: relative;
+    overflow: hidden;
 }
 
 .btn-accent:hover {
@@ -264,6 +333,21 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(249, 75, 31, 0.4);
     color: var(--text);
+}
+
+.btn-accent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: 0.5s;
+}
+
+.btn-accent:hover::before {
+  left: 100%;
 }
 
 .btn-outline-light {
@@ -277,16 +361,32 @@ body {
     border-color: rgba(255, 255, 255, 0.5);
 }
 
-/* Override default badge colors */
-.badge.bg-info {
-    background-color: var(--accent) !important;
+.btn-sm {
+    padding: 0.25rem 0.8rem;
+    font-size: 0.875rem;
 }
 
+/* ====== BADGES ====== */
+
+.badge {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    letter-spacing: 0.5px;
+}
+
+.badge.bg-info,
 .badge.bg-primary {
     background-color: var(--accent) !important;
 }
 
-/* Category Section */
+.badge.bg-accent {
+    background-color: var(--accent);
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+    border-radius: 0.4rem;
+}
+
+/* ====== SECTION LAYOUT ====== */
+
 .category-section {
     padding: 4rem 0;
 }
@@ -308,7 +408,165 @@ body {
     background-color: var(--accent);
 }
 
-/* Admin Dashboard */
+/* ====== TABLES ====== */
+
+.table {
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.05);
+    margin-bottom: 0;
+}
+
+.table th {
+    background: linear-gradient(to bottom, rgba(15, 15, 15, 0.95), rgba(8, 8, 8, 0.95));
+    padding: 1.2rem 1rem;
+    font-weight: 700;
+    border-bottom: 2px solid var(--accent);
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    letter-spacing: 0.5px;
+}
+
+.text-center-column {
+    text-align: center;
+}
+
+.table td {
+    padding: 1rem;
+    border-color: rgba(255, 255, 255, 0.05);
+    vertical-align: middle;
+}
+
+.table-responsive {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+}
+
+.table-hover tbody tr {
+  transition: all 0.2s ease;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(249, 75, 31, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 1;
+}
+
+/* Highlight positive and negative values */
+td[data-value-type="positive"] {
+  color: #4caf50;
+}
+
+td[data-value-type="negative"] {
+  color: #f44336;
+}
+
+/* Add highlights to important stats */
+.important-stat {
+  position: relative;
+}
+
+.important-stat::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--accent), transparent);
+}
+
+/* ====== CLICKABLE ROWS ====== */
+
+.clickable-row {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.clickable-row::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--accent);
+    transition: width 0.3s ease;
+}
+
+.clickable-row:hover::after {
+    width: 100%;
+}
+
+.clickable-row:hover {
+    background-color: var(--accent-transparent) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.clickable-row:hover td {
+    color: #ffffff;
+}
+
+.clickable-row td img {
+  transition: all 0.2s ease;
+}
+
+.clickable-row:hover td img {
+  transform: scale(1.15);
+}
+
+/* ====== PAGINATION ====== */
+
+.pagination {
+    margin-bottom: 0;
+}
+
+.pagination .page-item .page-link {
+    color: var(--text);
+    background: linear-gradient(to bottom right, rgba(15, 15, 15, 0.95), rgba(5, 5, 5, 0.95));
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin: 0 3px;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.8rem;
+    transition: var(--hover-transition);
+    box-shadow: var(--card-shadow);
+    font-weight: 500;
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(to right, var(--accent), #fa6831);
+    border-color: transparent;
+    color: var(--text);
+    box-shadow: 0 2px 8px rgba(249, 75, 31, 0.3);
+    transform: translateY(-2px);
+}
+
+.pagination .page-item .page-link:hover:not(.disabled) {
+    background-color: var(--accent-transparent);
+    border-color: rgba(249, 75, 31, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.pagination .page-item.disabled .page-link {
+    background: rgba(10, 10, 10, 0.5);
+    border-color: rgba(255, 255, 255, 0.02);
+    color: rgba(255, 255, 255, 0.3);
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    margin-top: 0.75rem;
+}
+
+/* ====== ADMIN DASHBOARD ====== */
+
 .admin-stats-card {
     border-radius: 1rem;
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -367,163 +625,46 @@ body {
     margin-right: 0.5rem;
 }
 
-.badge.bg-accent {
-    background-color: var(--accent);
-    font-weight: 500;
-    padding: 0.35em 0.65em;
-    border-radius: 0.4rem;
+/* ====== WEAPON DETAIL PAGE ====== */
+
+/* Weapon card styling */
+.weapon-card {
+    height: 100%;
 }
 
-/* Tables */
-.table {
-    color: var(--text);
-    border-color: rgba(255, 255, 255, 0.05);
-    margin-bottom: 0;
-}
-
-.table th {
-    background: linear-gradient(to bottom, rgba(15, 15, 15, 0.95), rgba(8, 8, 8, 0.95));
-    padding: 1.2rem 1rem;
-    font-weight: 700;
-    border-bottom: 2px solid var(--accent);
-    text-align: center;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-    letter-spacing: 0.5px;
-}
-
-/* Center align specific columns */
-.text-center-column {
-    text-align: center;
-}
-
-.table td {
-    padding: 1rem;
-    border-color: rgba(255, 255, 255, 0.05);
-    vertical-align: middle;
-}
-
-.table-responsive {
-    border-radius: 0.5rem;
-    overflow: hidden;
-    box-shadow: var(--card-shadow);
-}
-
-.table-hover tbody tr:hover {
-    background-color: rgba(249, 75, 31, 0.05);
-}
-
-.table .btn-sm {
-    padding: 0.25rem 0.8rem;
-    font-size: 0.875rem;
-}
-
-/* Enhanced Pagination Styling */
-.pagination {
-    margin-bottom: 0;
-}
-
-.pagination .page-item .page-link {
-    color: var(--text);
-    background: linear-gradient(to bottom right, rgba(15, 15, 15, 0.95), rgba(5, 5, 5, 0.95));
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    margin: 0 3px;
-    border-radius: 0.5rem;
-    padding: 0.5rem 0.8rem;
-    transition: var(--hover-transition);
-    box-shadow: var(--card-shadow);
-    font-weight: 500;
-}
-
-.pagination .page-item.active .page-link {
-    background: linear-gradient(to right, var(--accent), #fa6831);
-    border-color: transparent;
-    color: var(--text);
-    box-shadow: 0 2px 8px rgba(249, 75, 31, 0.3);
-    transform: translateY(-2px);
-}
-
-.pagination .page-item .page-link:hover:not(.disabled) {
-    background-color: var(--accent-transparent);
-    border-color: rgba(249, 75, 31, 0.3);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-}
-
-.pagination .page-item.disabled .page-link {
-    background: rgba(10, 10, 10, 0.5);
-    border-color: rgba(255, 255, 255, 0.02);
-    color: rgba(255, 255, 255, 0.3);
-    box-shadow: none;
-    cursor: not-allowed;
-}
-
-/* Pagination info text */
-.pagination-info {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 0.9rem;
-    margin-top: 0.75rem;
-}
-
-/* Enhanced hover effect for table rows */
-.clickable-row:hover {
-    background-color: var(--accent-transparent) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.clickable-row:hover td {
-    color: #ffffff;
-    transition: var(--hover-transition);
-}
-
-/* Footer */
-footer {
-    background-color: var(--primary);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 3rem 0;
-    margin-top: 4rem;
-}
-
-.footer-content {
+.weapon-card .card-body {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    min-height: 500px;
+}
+
+.weapon-image-container {
+    display: flex;
+    justify-content: center;
     align-items: center;
+    flex-grow: 1;
+    padding: 20px 0;
+    perspective: 1000px;
 }
 
-.footer-text {
-    margin-bottom: 0;
-    color: rgba(255, 255, 255, 0.7);
+.weapon-image {
+    max-height: 320px;
+    max-width: 320px;
+    object-fit: contain;
+    transition: all 0.3s ease;
 }
 
-/* Responsive */
-@media (max-width: 992px) {
-    .hero-title {
-        font-size: 2.8rem;
-    }
-    
-    .hero-section {
-        padding: 4rem 0;
-    }
+.weapon-image:hover {
+  transform: scale(1.05) translateY(-5px);
+  filter: drop-shadow(0 5px 15px rgba(249, 75, 31, 0.3));
 }
 
-@media (max-width: 768px) {
-    .hero-title {
-        font-size: 2.2rem;
-    }
-    
-    .hero-subtitle {
-        font-size: 1.1rem;
-    }
-    
-    .hero-section {
-        padding: 3rem 0;
-    }
-    
-    .section-title {
-        margin-bottom: 2rem;
-    }
+.weapon-info {
+    text-align: center;
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 20px;
 }
-
-/* Weapon Detail Page Styles */
 
 /* Custom table styling for weapon details */
 .stat-label {
@@ -535,6 +676,12 @@ footer {
     padding: 0.8rem 1rem !important;
     text-shadow: none;
     letter-spacing: normal;
+    transition: all 0.2s ease;
+}
+
+tr:hover .stat-label {
+  color: var(--accent);
+  text-shadow: 0 0 5px rgba(249, 75, 31, 0.2);
 }
 
 .table tbody tr:last-child .stat-label {
@@ -565,36 +712,68 @@ footer {
     padding: 8px 16px;
     border-radius: 6px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
 }
 
-/* Weapon card styling */
-.weapon-card {
-    height: 100%;
+.class-list .badge:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
 }
 
-.weapon-card .card-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 500px;
-}
+/* ====== FOOTER ====== */
 
-.weapon-image-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-grow: 1;
-    padding: 20px 0;
-}
-
-.weapon-image {
-    max-height: 320px;
-    max-width: 320px;
-    object-fit: contain;
-}
-
-.weapon-info {
-    text-align: center;
-    margin-top: auto;
+footer {
+    background-color: var(--primary);
     border-top: 1px solid rgba(255, 255, 255, 0.05);
-    padding-top: 20px;
+    padding: 3rem 0;
+    margin-top: 4rem;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-text {
+    margin-bottom: 0;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* ====== RESPONSIVE STYLES ====== */
+
+@media (max-width: 992px) {
+    .hero-title {
+        font-size: 2.8rem;
+    }
+    
+    .hero-section {
+        padding: 4rem 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .hero-section {
+        padding: 3rem 0;
+    }
+    
+    .section-title {
+        margin-bottom: 2rem;
+    }
+    
+    .card:hover {
+        transform: translateY(-3px); /* Less dramatic on mobile */
+    }
+      
+    .weapon-image:hover {
+        transform: scale(1.03); /* Less dramatic on mobile */
+    }
 }

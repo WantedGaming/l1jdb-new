@@ -15,7 +15,7 @@ function getCategories() {
         ['id' => 'pages/weapon/weapon', 'name' => 'Weapons', 'icon' => 'weapon.png', 'sql' => ['weapon.sql', 'weapon_skill.sql', 'weapon_skill_model.sql', 'weapons_skill_spell_def.sql']],
         ['id' => 'armor', 'name' => 'Armor', 'icon' => 'armor.png', 'sql' => ['armor.sql', 'armor_set.sql']],
         ['id' => 'items', 'name' => 'Items', 'icon' => 'item.png', 'sql' => ['etcitem.sql']],
-        ['id' => 'monsters', 'name' => 'Monsters', 'icon' => 'monster.png', 'sql' => ['npc.sql', 'mobskill.sql', 'mobgroup.sql']],
+        ['id' => 'pages/monsters/monsters', 'name' => 'Monsters', 'icon' => 'monster.png', 'sql' => ['npc.sql', 'mobskill.sql', 'mobgroup.sql']],
         ['id' => 'maps', 'name' => 'Maps', 'icon' => 'map.png', 'sql' => ['mapids.sql']],
         ['id' => 'dolls', 'name' => 'Dolls', 'icon' => 'doll.png', 'sql' => ['npc.sql', 'magicdoll_info.sql', 'magicdoll_potential.sql']],
         ['id' => 'npcs', 'name' => 'NPCs', 'icon' => 'npc.png', 'sql' => ['npc.sql']],

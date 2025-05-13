@@ -2,7 +2,7 @@
     <footer>
         <div class="container">
             <div class="footer-content">
-                <p class="footer-text">L1J Remastered Database Browser</p>
+                <p class="footer-text">L1J Remastered Database Admin Panel</p>
                 <p class="footer-text">Copyright &copy; <?php echo date('Y'); ?></p>
             </div>
         </div>
@@ -13,6 +13,6 @@
     <!-- Font Awesome -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <!-- Custom JS -->
-    <script src="assets/js/main.js"></script>
+    <script src="../assets/js/main.js"></script>
 </body>
 </html>

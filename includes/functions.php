@@ -12,7 +12,7 @@ function sanitizeInput($data) {
 // Function to get categories for navigation
 function getCategories() {
     return [
-        ['id' => 'pages/weapons', 'name' => 'Weapons', 'icon' => 'weapon.png', 'sql' => ['weapon.sql', 'weapon_skill.sql', 'weapon_skill_model.sql', 'weapons_skill_spell_def.sql']],
+        ['id' => 'pages/weapon/weapon', 'name' => 'Weapons', 'icon' => 'weapon.png', 'sql' => ['weapon.sql', 'weapon_skill.sql', 'weapon_skill_model.sql', 'weapons_skill_spell_def.sql']],
         ['id' => 'armor', 'name' => 'Armor', 'icon' => 'armor.png', 'sql' => ['armor.sql', 'armor_set.sql']],
         ['id' => 'items', 'name' => 'Items', 'icon' => 'item.png', 'sql' => ['etcitem.sql']],
         ['id' => 'monsters', 'name' => 'Monsters', 'icon' => 'monster.png', 'sql' => ['npc.sql', 'mobskill.sql', 'mobgroup.sql']],
@@ -26,7 +26,18 @@ function getCategories() {
 
 // Function to get category image
 function getCategoryImage($category) {
-    return "assets/img/placeholders/{$category}.png";
+    // Extract just the last part of the path
+    $parts = explode('/', $category);
+    $lastPart = end($parts);
+    
+    // Map specific categories if needed
+    $imageMap = [
+        'weapon' => 'weapons'  // Map 'weapon' to 'weapons.png'
+    ];
+    
+    $imageName = isset($imageMap[$lastPart]) ? $imageMap[$lastPart] : $lastPart;
+    
+    return "assets/img/placeholders/{$imageName}.png";
 }
 
 // Function to get category description
@@ -51,4 +62,21 @@ function getBaseUrl() {
     $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'];
     $base_dir = str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
     return $base_url . $base_dir;
+}
+
+function cleanItemName($name) {
+    // List of prefixes to remove
+    $prefixes = [
+        '\aH', '\aF', '\f4', '\a', '\f', '\H', '\F'
+    ];
+    
+    // Remove each prefix from the name
+    foreach ($prefixes as $prefix) {
+        $name = str_replace($prefix, '', $name);
+    }
+    
+    // Trim any extra whitespace
+    $name = trim($name);
+    
+    return $name;
 }

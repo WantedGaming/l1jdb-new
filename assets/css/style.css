@@ -382,10 +382,18 @@ body {
 }
 
 .table th {
-    background-color: rgba(10, 10, 10, 0.8);
-    padding: 1rem;
-    font-weight: 600;
-    border-color: rgba(255, 255, 255, 0.05);
+    background: linear-gradient(to bottom, rgba(15, 15, 15, 0.95), rgba(8, 8, 8, 0.95));
+    padding: 1.2rem 1rem;
+    font-weight: 700;
+    border-bottom: 2px solid var(--accent);
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    letter-spacing: 0.5px;
+}
+
+/* Center align specific columns */
+.text-center-column {
+    text-align: center;
 }
 
 .table td {
@@ -407,6 +415,64 @@ body {
 .table .btn-sm {
     padding: 0.25rem 0.8rem;
     font-size: 0.875rem;
+}
+
+/* Enhanced Pagination Styling */
+.pagination {
+    margin-bottom: 0;
+}
+
+.pagination .page-item .page-link {
+    color: var(--text);
+    background: linear-gradient(to bottom right, rgba(15, 15, 15, 0.95), rgba(5, 5, 5, 0.95));
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin: 0 3px;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.8rem;
+    transition: var(--hover-transition);
+    box-shadow: var(--card-shadow);
+    font-weight: 500;
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(to right, var(--accent), #fa6831);
+    border-color: transparent;
+    color: var(--text);
+    box-shadow: 0 2px 8px rgba(249, 75, 31, 0.3);
+    transform: translateY(-2px);
+}
+
+.pagination .page-item .page-link:hover:not(.disabled) {
+    background-color: var(--accent-transparent);
+    border-color: rgba(249, 75, 31, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.pagination .page-item.disabled .page-link {
+    background: rgba(10, 10, 10, 0.5);
+    border-color: rgba(255, 255, 255, 0.02);
+    color: rgba(255, 255, 255, 0.3);
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+/* Pagination info text */
+.pagination-info {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    margin-top: 0.75rem;
+}
+
+/* Enhanced hover effect for table rows */
+.clickable-row:hover {
+    background-color: var(--accent-transparent) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.clickable-row:hover td {
+    color: #ffffff;
+    transition: var(--hover-transition);
 }
 
 /* Footer */
@@ -455,4 +521,80 @@ footer {
     .section-title {
         margin-bottom: 2rem;
     }
+}
+
+/* Weapon Detail Page Styles */
+
+/* Custom table styling for weapon details */
+.stat-label {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: var(--accent);
+    font-weight: 600;
+    text-align: left !important;
+    padding: 0.8rem 1rem !important;
+    text-shadow: none;
+    letter-spacing: normal;
+}
+
+.table tbody tr:last-child .stat-label {
+    border-bottom: none !important;
+}
+
+/* Class list styling */
+.allowed-classes {
+    display: flex;
+    justify-content: center;
+}
+
+.class-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.class-list li {
+    margin-bottom: 10px;
+}
+
+.class-list .badge {
+    font-size: 1rem;
+    padding: 8px 16px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Weapon card styling */
+.weapon-card {
+    height: 100%;
+}
+
+.weapon-card .card-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+}
+
+.weapon-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    padding: 20px 0;
+}
+
+.weapon-image {
+    max-height: 320px;
+    max-width: 320px;
+    object-fit: contain;
+}
+
+.weapon-info {
+    text-align: center;
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 20px;
 }

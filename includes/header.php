@@ -1,5 +1,5 @@
-<?php require_once 'includes/config.php'; ?>
-<?php require_once 'includes/functions.php'; ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/l1jdb-new/includes/config.php'; ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/l1jdb-new/includes/functions.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Custom CSS -->
-    <link href="assets/css/style.css" rel="stylesheet">
+	<link href="<?php echo $_SERVER['DOCUMENT_ROOT'] ? '/' : ''; ?>l1jdb-new/assets/css/style.css" rel="stylesheet">
 </head>
 <body>
     <!-- Navigation Bar -->

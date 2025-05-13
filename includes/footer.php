@@ -13,6 +13,6 @@
     <!-- Font Awesome -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <!-- Custom JS -->
-    <script src="assets/js/main.js"></script>
+	<script src="<?php echo $_SERVER['DOCUMENT_ROOT'] ? '/' : ''; ?>l1jdb-new/assets/js/main.js"></script>
 </body>
 </html>

@@ -36,7 +36,7 @@
                             <h5 class="card-title"><?php echo $category['name']; ?></h5>
                             <p class="card-text"><?php echo getCategoryDescription($category['id']); ?></p>
                             <div class="mt-auto">
-                                <a href="<?php echo $category['id']; ?>/list.php" class="btn btn-accent">Explore</a>
+                                <a href="<?php echo $category['id']; ?>_list.php" class="btn btn-accent">Explore</a>
                             </div>
                         </div>
                     </div>

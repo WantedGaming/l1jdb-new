@@ -372,9 +372,141 @@ $monster = $result->fetch_assoc();
         </div>
     </div>
     
+    <!-- Item Drops Section -->
+    <?php
+    // Fetch items dropped by this monster
+    $drop_sql = "SELECT d.* FROM droplist d WHERE d.mobId = $monster_id ORDER BY d.chance DESC";
+    $drop_result = $conn->query($drop_sql);
+    
+    if ($drop_result && $drop_result->num_rows > 0):
+    ?>
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Item Drops</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Item</th>
+                                    <th>Type</th>
+                                    <th class="text-center">Min</th>
+                                    <th class="text-center">Max</th>
+                                    <th class="text-center">Chance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                while ($drop = $drop_result->fetch_assoc()):
+                                    // Calculate drop chance in percentage
+                                    $dropChance = ($drop['chance'] / 10000) * 100;
+                                    $dropChanceDisplay = ($dropChance < 0.01) ? "< 0.01%" : number_format($dropChance, 2) . "%";
+                                    
+                                    // Determine color for drop chance
+                                    if ($dropChance < 1) {
+                                        $chanceColor = '#ff3333'; // Red for very rare
+                                    } elseif ($dropChance < 5) {
+                                        $chanceColor = '#ff6600'; // Orange for rare
+                                    } elseif ($dropChance < 20) {
+                                        $chanceColor = '#ffcc00'; // Yellow for uncommon
+                                    } elseif ($dropChance < 50) {
+                                        $chanceColor = '#99cc00'; // Light green for common
+                                    } else {
+                                        $chanceColor = '#33cc33'; // Green for very common
+                                    }
+                                    
+                                    // Determine item type and get item details
+                                    $itemId = $drop['itemId'];
+                                    
+                                    // Check if it's a weapon
+                                    $weapon_sql = "SELECT item_id, desc_en, type, iconId FROM weapon WHERE item_id = $itemId";
+                                    $weapon_result = $conn->query($weapon_sql);
+                                    
+                                    // Check if it's armor
+                                    $armor_sql = "SELECT item_id, desc_en, type, iconId FROM armor WHERE item_id = $itemId";
+                                    $armor_result = $conn->query($armor_sql);
+                                    
+                                    // Check if it's an etc item
+                                    $etcitem_sql = "SELECT item_id, desc_en, item_type as type, iconId FROM etcitem WHERE item_id = $itemId";
+                                    $etcitem_result = $conn->query($etcitem_sql);
+                                    
+                                    $item = null;
+                                    $item_type = '';
+                                    $detail_link = '';
+                                    
+                                    if ($weapon_result && $weapon_result->num_rows > 0) {
+                                        $item = $weapon_result->fetch_assoc();
+                                        $item_type = 'Weapon';
+                                        $detail_link = '../../pages/weapon/weapon_detail.php?id=' . $item['item_id'];
+                                    } elseif ($armor_result && $armor_result->num_rows > 0) {
+                                        $item = $armor_result->fetch_assoc();
+                                        $item_type = 'Armor';
+                                        $detail_link = '../../armor_detail.php?id=' . $item['item_id'];
+                                    } elseif ($etcitem_result && $etcitem_result->num_rows > 0) {
+                                        $item = $etcitem_result->fetch_assoc();
+                                        $item_type = 'Item';
+                                        $detail_link = '../../item_detail.php?id=' . $item['item_id'];
+                                    } else {
+                                        // Skip if item not found
+                                        continue;
+                                    }
+                                    
+                                    // Clean item name
+                                    $cleanItemName = cleanItemName($item['desc_en']);
+                                    
+                                    // Normalize type display
+                                    $typeDisplay = normalizeText($item['type']);
+                                ?>
+                                <tr class="clickable-row" data-href="<?php echo $detail_link; ?>">
+                                    <td>
+                                        <img src="/l1jdb-new/assets/img/icons/icons/<?php echo $item['iconId']; ?>.png" 
+                                             alt="<?php echo htmlspecialchars($cleanItemName); ?>" 
+                                             style="width: 32px; height: 32px;" 
+                                             onerror="this.src='/l1jdb-new/assets/img/placeholders/noiconid.png';">
+                                    </td>
+                                    <td><?php echo htmlspecialchars($cleanItemName); ?></td>
+                                    <td>
+                                        <span class="badge bg-info"><?php echo $item_type; ?> - <?php echo htmlspecialchars($typeDisplay); ?></span>
+                                    </td>
+                                    <td class="text-center"><?php echo $drop['min']; ?></td>
+                                    <td class="text-center"><?php echo $drop['max']; ?></td>
+                                    <td class="text-center" style="color: <?php echo $chanceColor; ?>; font-weight: bold;">
+                                        <?php echo $dropChanceDisplay; ?>
+                                    </td>
+                                </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+    
     <div class="text-center mt-4 mb-5">
-        <a href="monsters_list.php" class="btn btn-outline-light"><i class="fas fa-arrow-left mr-2"></i> Back to Monster List</a>
+        <a href="<?php echo getBackUrl('monsters_list.php'); ?>" class="btn btn-outline-light"><i class="fas fa-arrow-left mr-2"></i> Back to Monster List</a>
     </div>
 </section>
+
+<!-- Add JavaScript for clickable rows -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var rows = document.querySelectorAll('.clickable-row');
+    
+    rows.forEach(function(row) {
+        row.addEventListener('click', function() {
+            const href = this.getAttribute('data-href');
+            if (href && href !== '#') {
+                window.location.href = href;
+            }
+        });
+    });
+});
+</script>
 
 <?php include '../../includes/footer.php'; ?>

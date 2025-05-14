@@ -13,14 +13,14 @@ function sanitizeInput($data) {
 function getCategories() {
     return [
         ['id' => 'pages/weapon/weapon', 'name' => 'Weapons', 'icon' => 'weapon.png', 'sql' => ['weapon.sql', 'weapon_skill.sql', 'weapon_skill_model.sql', 'weapons_skill_spell_def.sql']],
-        ['id' => 'armor', 'name' => 'Armor', 'icon' => 'armor.png', 'sql' => ['armor.sql', 'armor_set.sql']],
-        ['id' => 'items', 'name' => 'Items', 'icon' => 'item.png', 'sql' => ['etcitem.sql']],
+        ['id' => 'pages/armor/armor', 'name' => 'Armor', 'icon' => 'armor.png', 'sql' => ['armor.sql', 'armor_set.sql']],
+        ['id' => 'pages/items/items', 'name' => 'Items', 'icon' => 'item.png', 'sql' => ['etcitem.sql']],
         ['id' => 'pages/monsters/monsters', 'name' => 'Monsters', 'icon' => 'monster.png', 'sql' => ['npc.sql', 'mobskill.sql', 'mobgroup.sql']],
-        ['id' => 'maps', 'name' => 'Maps', 'icon' => 'map.png', 'sql' => ['mapids.sql']],
-        ['id' => 'dolls', 'name' => 'Dolls', 'icon' => 'doll.png', 'sql' => ['npc.sql', 'magicdoll_info.sql', 'magicdoll_potential.sql']],
-        ['id' => 'npcs', 'name' => 'NPCs', 'icon' => 'npc.png', 'sql' => ['npc.sql']],
-        ['id' => 'skills', 'name' => 'Skills', 'icon' => 'skill.png', 'sql' => ['skills.sql', 'skills_hanlder.sql', 'skills_info.sql', 'skills_passive.sql']],
-        ['id' => 'polymorph', 'name' => 'Polymorph', 'icon' => 'poly.png', 'sql' => ['polymorphs.sql']]
+        ['id' => 'pages/maps/maps', 'name' => 'Maps', 'icon' => 'map.png', 'sql' => ['mapids.sql']],
+        ['id' => 'pages/dolls/dolls', 'name' => 'Dolls', 'icon' => 'doll.png', 'sql' => ['npc.sql', 'magicdoll_info.sql', 'magicdoll_potential.sql']],
+        ['id' => 'pages/npcs/npcs', 'name' => 'NPCs', 'icon' => 'npc.png', 'sql' => ['npc.sql']],
+        ['id' => 'pages/skills/skills', 'name' => 'Skills', 'icon' => 'skill.png', 'sql' => ['skills.sql', 'skills_hanlder.sql', 'skills_info.sql', 'skills_passive.sql']],
+        ['id' => 'pages/polymorph/polymorph', 'name' => 'Polymorph', 'icon' => 'poly.png', 'sql' => ['polymorphs.sql']]
     ];
 }
 
@@ -64,6 +64,7 @@ function getBaseUrl() {
     return $base_url . $base_dir;
 }
 
+// Clean item name by removing special prefixes
 function cleanItemName($name) {
     // List of prefixes to remove
     $prefixes = [
@@ -79,4 +80,69 @@ function cleanItemName($name) {
     $name = trim($name);
     
     return $name;
+}
+
+/**
+ * Normalize text from all-caps to Title Case
+ * Replaces underscores with spaces and converts to proper case
+ * 
+ * @param string $text The text to normalize
+ * @return string The normalized text
+ */
+function normalizeText($text) {
+    // Replace underscores with spaces
+    $text = str_replace('_', ' ', $text);
+    
+    // Convert to title case (capitalize first letter of each word)
+    $text = ucwords(strtolower($text));
+    
+    // Special case handling
+    $text = str_replace('Tohand', 'Two-Handed', $text);
+    
+    return trim($text);
+}
+
+/**
+ * Normalize material names from database format
+ * Removes Korean text in parentheses, replaces underscores, and normalizes case
+ * 
+ * @param string $material The material name to normalize
+ * @return string The normalized material name
+ */
+function normalizeMaterial($material) {
+    // Remove Korean text in parentheses
+    $material = preg_replace('/\([^)]*\)/', '', $material);
+    
+    // Replace underscores with spaces
+    $material = str_replace('_', ' ', $material);
+    
+    // Remove "NONE(-)" and just return "None"
+    $material = str_replace('NONE(-)', 'None', $material);
+    
+    // Convert to title case
+    $material = ucwords(strtolower($material));
+    
+    return trim($material);
+}
+
+/**
+ * Generate a back URL that preserves query parameters
+ * Used for "Back to List" links in detail pages
+ * 
+ * @param string $default_url The default URL to return to if no referer is available
+ * @return string The URL with query parameters preserved
+ */
+function getBackUrl($default_url) {
+    $back_url = $default_url;
+    
+    // Check if there are query parameters we need to preserve
+    if (isset($_SERVER['HTTP_REFERER'])) {
+        $referer = $_SERVER['HTTP_REFERER'];
+        $query_string = parse_url($referer, PHP_URL_QUERY);
+        if (!empty($query_string)) {
+            $back_url .= "?" . $query_string;
+        }
+    }
+    
+    return $back_url;
 }

@@ -91,11 +91,11 @@ $model_result = $conn->query($model_sql);
                                     </tr>
                                     <tr>
                                         <th class="stat-label">Type</th>
-                                        <td><?php echo $weapon['type']; ?></td>
+                                        <td><?php echo normalizeText($weapon['type']); ?></td>
                                     </tr>
                                     <tr>
                                         <th class="stat-label">Material</th>
-                                        <td><?php echo $weapon['material']; ?></td>
+                                        <td><?php echo normalizeMaterial($weapon['material']); ?></td>
                                     </tr>
                                     <tr>
                                         <th class="stat-label">Weight</th>
@@ -330,7 +330,7 @@ $model_result = $conn->query($model_sql);
                                         <th class="stat-label">All</th>
                                         <td><?php echo $weapon['regist_all']; ?></td>
                                     </tr>
-                                    <tr>
+                                                                                <tr>
                                         <th class="stat-label">Poison</th>
                                         <td><?php echo $weapon['poisonRegist'] == 'true' ? 'Yes' : 'No'; ?></td>
                                     </tr>
@@ -484,9 +484,110 @@ $model_result = $conn->query($model_sql);
     </div>
     <?php endif; ?>
     
+    <!-- Monster Drops Section -->
+    <?php
+    // Fetch monsters that drop this weapon
+    $drop_sql = "SELECT d.*, n.desc_en as monster_name, n.lvl as monster_level, n.is_bossmonster 
+                 FROM droplist d 
+                 JOIN npc n ON d.mobId = n.npcid 
+                 WHERE d.itemId = $weapon_id 
+                 ORDER BY d.chance DESC, n.lvl DESC";
+    $drop_result = $conn->query($drop_sql);
+    
+    if ($drop_result && $drop_result->num_rows > 0):
+    ?>
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Monster Drops</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Monster</th>
+                                    <th>Level</th>
+                                    <th class="text-center">Min</th>
+                                    <th class="text-center">Max</th>
+                                    <th class="text-center">Chance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while ($drop = $drop_result->fetch_assoc()): 
+                                    // Calculate drop chance in percentage
+                                    $dropChance = ($drop['chance'] / 10000) * 100;
+                                    $dropChanceDisplay = ($dropChance < 0.01) ? "< 0.01%" : number_format($dropChance, 2) . "%";
+                                    
+                                    // Determine color for drop chance
+                                    if ($dropChance < 1) {
+                                        $chanceColor = '#ff3333'; // Red for very rare
+                                    } elseif ($dropChance < 5) {
+                                        $chanceColor = '#ff6600'; // Orange for rare
+                                    } elseif ($dropChance < 20) {
+                                        $chanceColor = '#ffcc00'; // Yellow for uncommon
+                                    } elseif ($dropChance < 50) {
+                                        $chanceColor = '#99cc00'; // Light green for common
+                                    } else {
+                                        $chanceColor = '#33cc33'; // Green for very common
+                                    }
+                                    
+                                    // Get the monster sprite ID for its image
+                                    $monster_sql = "SELECT spriteId FROM npc WHERE npcid = " . $drop['mobId'];
+                                    $monster_result = $conn->query($monster_sql);
+                                    $monster_sprite = ($monster_result && $monster_result->num_rows > 0) ? 
+                                                      $monster_result->fetch_assoc()['spriteId'] : '';
+                                ?>
+                                <tr class="clickable-row" data-href="../../pages/monsters/monster_detail.php?id=<?php echo $drop['mobId']; ?>">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <?php if (!empty($monster_sprite)): ?>
+                                            <img src="/l1jdb-new/assets/img/icons/monsters/ms<?php echo $monster_sprite; ?>.gif" 
+                                                 alt="<?php echo htmlspecialchars($drop['monster_name']); ?>" 
+                                                 style="width: 32px; height: 32px; margin-right: 10px;" 
+                                                 onerror="this.onerror=null;this.src='/l1jdb-new/assets/img/icons/monsters/ms<?php echo $monster_sprite; ?>.png';
+                                                          this.onerror=function(){this.src='/l1jdb-new/assets/img/placeholders/monster-placeholder.png';}">
+                                            <?php endif; ?>
+                                            <span><?php echo htmlspecialchars($drop['monster_name']); ?></span>
+                                            <?php if ($drop['is_bossmonster'] == 'true'): ?>
+                                                <span class="badge bg-accent ml-2">Boss</span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </td>
+                                    <td><?php echo $drop['monster_level']; ?></td>
+                                    <td class="text-center"><?php echo $drop['min']; ?></td>
+                                    <td class="text-center"><?php echo $drop['max']; ?></td>
+                                    <td class="text-center" style="color: <?php echo $chanceColor; ?>; font-weight: bold;">
+                                        <?php echo $dropChanceDisplay; ?>
+                                    </td>
+                                </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+    
     <div class="text-center mt-4 mb-5">
-        <a href="weapon_list.php" class="btn btn-outline-light"><i class="fas fa-arrow-left mr-2"></i> Back to Weapons List</a>
+        <a href="<?php echo getBackUrl('weapon_list.php'); ?>" class="btn btn-outline-light"><i class="fas fa-arrow-left mr-2"></i> Back to Weapons List</a>
     </div>
 </section>
+
+<!-- Add JavaScript for clickable rows -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var rows = document.querySelectorAll('.clickable-row');
+    
+    rows.forEach(function(row) {
+        row.addEventListener('click', function() {
+            window.location.href = this.getAttribute('data-href');
+        });
+    });
+});
+</script>
 
 <?php include '../../includes/footer.php'; ?>

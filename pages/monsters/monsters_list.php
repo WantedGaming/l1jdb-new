@@ -72,26 +72,31 @@ function getPaginationUrl($page) {
             <p class="hero-subtitle">Browse all monsters in L1J Remastered</p>
             
             <!-- Search Form -->
-            <form class="search-form mt-4" method="GET" action="">
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" name="search" placeholder="Search monsters..." value="<?php echo htmlspecialchars($search); ?>">
-                    <button class="btn btn-accent" type="submit">Search</button>
+<form class="search-form mt-4" method="GET" action="">
+    <!-- Search input on top -->
+    <div class="input-group mb-3">
+        <input type="text" class="form-control search-input" name="search" placeholder="Search monsters..." value="<?php echo htmlspecialchars($search); ?>">
+        <button class="btn btn-accent" type="submit">Search</button>
+    </div>
+    
+    <!-- Filter options below -->
+    <div class="filter-options">
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <div class="input-group">
+                    <span class="input-group-text">Min Level</span>
+                    <input type="number" class="form-control filter-select" name="level_min" placeholder="Minimum level" value="<?php echo htmlspecialchars($level_min); ?>">
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <span class="input-group-text">Level Min</span>
-                            <input type="number" class="form-control" name="level_min" placeholder="Min level" value="<?php echo htmlspecialchars($level_min); ?>">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <span class="input-group-text">Level Max</span>
-                            <input type="number" class="form-control" name="level_max" placeholder="Max level" value="<?php echo htmlspecialchars($level_max); ?>">
-                        </div>
-                    </div>
+            </div>
+            <div class="col-md-6 mb-2">
+                <div class="input-group">
+                    <span class="input-group-text">Max Level</span>
+                    <input type="number" class="form-control filter-select" name="level_max" placeholder="Maximum level" value="<?php echo htmlspecialchars($level_max); ?>">
                 </div>
-            </form>
+            </div>
+        </div>
+    </div>
+</form>
         </div>
     </div>
 </section>

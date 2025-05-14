@@ -206,8 +206,8 @@ function getPaginationUrl($page) {
         <div class="row">
             <?php while ($row = $result->fetch_assoc()): 
                 // Get map image path
-                $mapImagePath = '/l1jdb-new/assets/img/icons/maps/' . $row['pngId'] . '.jpeg';
-                $placeholderPath = '/l1jdb-new/assets/img/placeholders/map-placeholder.png';
+                $mapImagePath = '/l1jdb-new/assets/img/icons/' . $row['pngId'] . '.png';
+                $placeholderPath = '/l1jdb-new/assets/img/icons/9175.png';
                 
                 // Prepare map type badges
                 $badges = [];

@@ -188,10 +188,10 @@ while ($row = $materials_result->fetch_assoc()) {
                     ?>
                         <tr class="clickable-row" data-href="item_detail.php?id=<?php echo $row['item_id']; ?>">
                             <td>
-                                <img src="/l1jdb-new/assets/img/icons/icons/<?php echo $row['iconId']; ?>.png" 
+                                <img src="/l1jdb-new/assets/img/icons/<?php echo $row['iconId']; ?>.png" 
                                      alt="<?php echo htmlspecialchars($cleanName); ?>" 
                                      style="width: 32px; height: 32px;" 
-                                     onerror="this.src='/l1jdb-new/assets/img/placeholders/noiconid.png';">
+                                     onerror="this.src='/l1jdb-new/assets/img/icons/9175.png';">
                             </td>
                             <td><?php echo htmlspecialchars($cleanName); ?></td>
                             <td>

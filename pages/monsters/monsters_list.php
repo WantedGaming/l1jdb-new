@@ -122,11 +122,11 @@ function getPaginationUrl($page) {
                     <?php while ($row = $result->fetch_assoc()): ?>
                         <tr class="clickable-row" data-href="monster_detail.php?id=<?php echo $row['npcid']; ?>">
                             <td>
-                                <img src="/l1jdb-new/assets/img/icons/monsters/ms<?php echo $row['spriteId']; ?>.gif" 
+                                <img src="/l1jdb-new/assets/img/icons/ms<?php echo $row['spriteId']; ?>.gif" 
                                      alt="<?php echo htmlspecialchars($row['desc_en']); ?>" 
                                      style="width: 32px; height: 32px;" 
-                                     onerror="this.onerror=null;this.src='/l1jdb-new/assets/img/icons/monsters/ms<?php echo $row['spriteId']; ?>.png'; 
-                                             this.onerror=function(){this.src='/l1jdb-new/assets/img/placeholders/monster-placeholder.png';}">
+                                     onerror="this.onerror=null;this.src='/l1jdb-new/assets/img/icons/ms<?php echo $row['spriteId']; ?>.png'; 
+                                             this.onerror=function(){this.src='/l1jdb-new/assets/img/icons/9175.png';}">
                             </td>
                             <td><?php echo htmlspecialchars($row['desc_en']); ?></td>
                             <td class="text-center-column"><?php echo $row['lvl']; ?></td>

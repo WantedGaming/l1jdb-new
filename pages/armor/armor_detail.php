@@ -37,18 +37,6 @@ function normalizeArmorType($type) {
     return trim($type);
 }
 
-// Function to normalize material display
-function normalizeMaterial($material) {
-    // Remove Korean text in parentheses
-    $material = preg_replace('/\([^)]*\)/', '', $material);
-    // Replace underscores with spaces
-    $material = str_replace('_', ' ', $material);
-    // Remove "NONE(-)" and just return "NONE"
-    $material = str_replace('NONE(-)', 'NONE', $material);
-    // Convert to title case
-    $material = ucwords(strtolower($material));
-    return trim($material);
-}
 
 // Function to get set item names
 function getSetItemNames($conn, $sets) {
@@ -92,10 +80,10 @@ function getSetItemNames($conn, $sets) {
                 </div>
                 <div class="card-body d-flex flex-column">
                     <div class="weapon-image-container flex-grow-1">
-                        <img src="/l1jdb-new/assets/img/icons/icons/<?php echo $armor['iconId']; ?>.png" 
+                        <img src="/l1jdb-new/assets/img/icons/<?php echo $armor['iconId']; ?>.png" 
                              alt="<?php echo htmlspecialchars($cleanArmorName); ?>" 
                              class="img-fluid weapon-image" 
-                             onerror="this.src='/l1jdb-new/assets/img/placeholders/armor.png';">
+                             onerror="this.src='/l1jdb-new/assets/img/icons/9175.png';">
                     </div>
                     <div class="weapon-info mt-auto">
                         <h4><?php echo htmlspecialchars($cleanArmorName); ?></h4>

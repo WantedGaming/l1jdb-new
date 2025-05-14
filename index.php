@@ -2,7 +2,14 @@
 
 <!-- Modern Hero Section with Search Bar -->
 <section class="hero-section">
-    <div class="container">
+    <div class="hero-background">
+        <picture>
+            <source srcset="assets/img/placeholders/hero-background.webp" type="image/webp">
+            <source srcset="assets/img/placeholders/hero-background.gif" type="image/gif"> 
+            <img src="images/hero-background.gif" alt="L1J Remastered Game World" class="hero-bg-img">
+        </picture>
+    </div>
+    <div class="container position-relative">
         <div class="row justify-content-center">
             <div class="col-lg-10 text-center hero-content">
                 <h1 class="hero-title">L1J <span>Remastered</span> Database</h1>
@@ -30,17 +37,26 @@
             foreach($categories as $category): 
             ?>
                 <div class="col-md-4">
-                    <div class="card h-100">
-                        <img src="<?php echo getCategoryImage($category['id']); ?>" class="card-img-top" alt="<?php echo $category['name']; ?>">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title"><?php echo $category['name']; ?></h5>
-                            <p class="card-text"><?php echo getCategoryDescription($category['id']); ?></p>
-                            <div class="mt-auto">
-                                <a href="<?php echo $category['id']; ?>_list.php" class="btn btn-accent">Explore</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+					<div class="card h-100">
+						<!-- Card Header with Title -->
+						<div class="card-header">
+							<h5><?php echo $category['name']; ?></h5>
+						</div>
+						
+						<!-- Image Container -->
+						<div class="card-img-container">
+							<img src="<?php echo getCategoryImage($category['id']); ?>" class="card-img-top" alt="<?php echo $category['name']; ?>">
+						</div>
+						
+						<!-- Card Body with Description -->
+						<div class="card-body">
+							<p class="card-description"><?php echo getCategoryDescription($category['id']); ?></p>
+						</div>
+						
+						<!-- Clickable Link Overlay -->
+						<a href="<?php echo $category['id']; ?>_list.php" class="card-link" aria-label="View <?php echo $category['name']; ?>"></a>
+					</div>
+				</div>
             <?php endforeach; ?>
         </div>
     </div>

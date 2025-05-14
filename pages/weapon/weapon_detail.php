@@ -49,10 +49,10 @@ $model_result = $conn->query($model_sql);
                 </div>
                 <div class="card-body d-flex flex-column">
                     <div class="weapon-image-container flex-grow-1">
-                        <img src="/l1jdb-new/assets/img/icons/icons/<?php echo $weapon['iconId']; ?>.png" 
+                        <img src="/l1jdb-new/assets/img/icons/<?php echo $weapon['iconId']; ?>.png" 
                              alt="<?php echo htmlspecialchars($cleanWeaponName); ?>" 
                              class="img-fluid weapon-image" 
-                             onerror="this.src='/l1jdb-new/assets/img/placeholders/weapon.png';">
+                             onerror="this.src='/l1jdb-new/assets/img/icons/9175.png';">
                     </div>
                     <div class="weapon-info mt-auto">
                         <h4><?php echo htmlspecialchars($cleanWeaponName); ?></h4>

@@ -41,10 +41,10 @@ $cleanItemName = cleanItemName($item['desc_en']);
                 </div>
                 <div class="card-body d-flex flex-column">
                     <div class="weapon-image-container flex-grow-1">
-                        <img src="/l1jdb-new/assets/img/icons/icons/<?php echo $item['iconId']; ?>.png" 
+                        <img src="/l1jdb-new/assets/img/icons/<?php echo $item['iconId']; ?>.png" 
                              alt="<?php echo htmlspecialchars($cleanItemName); ?>" 
                              class="img-fluid weapon-image" 
-                             onerror="this.src='/l1jdb-new/assets/img/placeholders/item.png';">
+                             onerror="this.src='/l1jdb-new/assets/img/icons/9175.png';">
                     </div>
                     <div class="weapon-info mt-auto">
                         <h4><?php echo htmlspecialchars($cleanItemName); ?></h4>
@@ -623,13 +623,13 @@ $cleanItemName = cleanItemName($item['desc_en']);
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <?php if (!empty($drop['spriteId'])): ?>
-                                            <img src="/l1jdb-new/assets/img/icons/monsters/ms<?php echo $drop['spriteId']; ?>.gif" 
+                                            <img src="/l1jdb-new/assets/img/icons/ms<?php echo $drop['spriteId']; ?>.gif" 
                                                  alt="<?php echo htmlspecialchars($drop['monster_name']); ?>" 
                                                  style="width: 32px; height: 32px; margin-right: 10px;" 
-                                                 onerror="this.onerror=null;this.src='/l1jdb-new/assets/img/icons/monsters/ms<?php echo $drop['spriteId']; ?>.png';
-                                                          this.onerror=function(){this.src='/l1jdb-new/assets/img/placeholders/monster-placeholder.png';}">
+                                                 onerror="this.onerror=null;this.src='/l1jdb-new/assets/img/icons/ms<?php echo $drop['spriteId']; ?>.png';
+                                                          this.onerror=function(){this.src='/l1jdb-new/assets/img/icons/9175.png';}">
                                             <?php endif; ?>
-                                            <span><?php echo htmlspecialchars($drop['monster_name']); ?></span>
+                                            <span><?php echo htmlspecialchars($drop['monster_name' ]); ?></span>
                                             <?php if ($drop['is_bossmonster'] == 'true'): ?>
                                                 <span class="badge bg-accent ml-2">Boss</span>
                                             <?php endif; ?>

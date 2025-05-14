@@ -54,8 +54,8 @@ function boolToBadge($value, $positive_class = 'bg-accent', $negative_class = 'b
                 <div class="card-body p-0 d-flex flex-column">
                     <div class="weapon-image-container flex-grow-1" style="min-height: 450px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                         <?php
-                        $mapImagePath = '/l1jdb-new/assets/img/icons/maps/' . $map['pngId'] . '.jpeg';
-                        $placeholderPath = '/l1jdb-new/assets/img/placeholders/map-placeholder.png';
+                        $mapImagePath = '/l1jdb-new/assets/img/icons/' . $map['pngId'] . '.png';
+                        $placeholderPath = '/l1jdb-new/assets/img/icons/9175.png';
                         ?>
                         <img src="<?php echo $mapImagePath; ?>" 
                              alt="<?php echo htmlspecialchars($map['locationname']); ?>" 
@@ -434,11 +434,11 @@ function boolToBadge($value, $positive_class = 'bg-accent', $negative_class = 'b
                                         ?>
                                         <tr class="clickable-row" data-href="../monsters/monster_detail.php?id=<?php echo $spawn['npc_templateid']; ?>">
                                             <td width="48">
-                                                <img src="/l1jdb-new/assets/img/icons/monsters/ms<?php echo $spriteId; ?>.gif" 
+                                                <img src="/l1jdb-new/assets/img/icons/ms<?php echo $spriteId; ?>.gif" 
                                                      alt="<?php echo htmlspecialchars($spawn['desc_en']); ?>" 
                                                      style="width: 32px; height: 32px;"
-                                                     onerror="this.onerror=null;this.src='/l1jdb-new/assets/img/icons/monsters/ms<?php echo $spriteId; ?>.png';
-                                                           this.onerror=function(){this.src='/l1jdb-new/assets/img/placeholders/monster-placeholder.png';}">
+                                                     onerror="this.onerror=null;this.src='/l1jdb-new/assets/img/icons/ms<?php echo $spriteId; ?>.png';
+                                                           this.onerror=function(){this.src='/l1jdb-new/assets/img/icons/9175.png';}">
                                             </td>
                                             <td>
                                                 <?php echo htmlspecialchars($spawn['desc_en']); ?>
@@ -519,11 +519,11 @@ function boolToBadge($value, $positive_class = 'bg-accent', $negative_class = 'b
                                         ?>
                                         <tr class="clickable-row" data-href="../monsters/monster_detail.php?id=<?php echo $boss['npcid']; ?>">
                                             <td width="48">
-                                                <img src="/l1jdb-new/assets/img/icons/monsters/ms<?php echo $spriteId; ?>.gif" 
+                                                <img src="/l1jdb-new/assets/img/icons/ms<?php echo $spriteId; ?>.gif" 
                                                      alt="<?php echo htmlspecialchars($boss['desc_en']); ?>" 
                                                      style="width: 32px; height: 32px;"
-                                                     onerror="this.onerror=null;this.src='/l1jdb-new/assets/img/icons/monsters/ms<?php echo $spriteId; ?>.png';
-                                                           this.onerror=function(){this.src='/l1jdb-new/assets/img/placeholders/monster-placeholder.png';}">
+                                                     onerror="this.onerror=null;this.src='/l1jdb-new/assets/img/icons/ms<?php echo $spriteId; ?>.png';
+                                                           this.onerror=function(){this.src='/l1jdb-new/assets/img/icons/9175.png';}">
                                             </td>
                                             <td>
                                                 <?php echo htmlspecialchars($boss['desc_en']); ?>
@@ -724,10 +724,10 @@ function boolToBadge($value, $positive_class = 'bg-accent', $negative_class = 'b
                                 ?>
                                 <tr class="<?php echo !empty($detail_link) ? 'clickable-row' : ''; ?>" data-href="<?php echo $detail_link; ?>">
                                     <td>
-                                        <img src="/l1jdb-new/assets/img/icons/icons/<?php echo $item['iconId']; ?>.png" 
+                                        <img src="/l1jdb-new/assets/img/icons/<?php echo $item['iconId']; ?>.png" 
                                              alt="<?php echo htmlspecialchars($cleanItemName); ?>" 
                                              style="width: 32px; height: 32px;" 
-                                             onerror="this.src='/l1jdb-new/assets/img/placeholders/noiconid.png';">
+                                             onerror="this.src='/l1jdb-new/assets/img/icons/9175.png';">
                                     </td>
                                     <td><?php echo htmlspecialchars($cleanItemName); ?></td>
                                     <td>

@@ -1,5 +1,16 @@
 <?php
-include '../../../includes/admin_header.php';
+// Start session first, before anything else
+session_start();
+
+// Include security and database connection files
+require_once '../../../includes/config.php';
+require_once '../../../includes/functions.php';
+require_once '../../../includes/admin_security.php';
+
+// Verify authentication
+requireAdminAuth();
+
+// Process all logic that might use header() redirects BEFORE including the header
 
 // Check if ID is provided
 if (!isset($_GET['id']) || empty($_GET['id'])) {
@@ -35,6 +46,11 @@ if (isset($_POST['confirm_delete']) && $_POST['confirm_delete'] == 'yes') {
         // Delete the weapon
         $delete_sql = "DELETE FROM weapon WHERE item_id = $weapon_id";
         if ($conn->query($delete_sql)) {
+            // Log the activity
+            if (function_exists('logAdminActivity')) {
+                logAdminActivity('delete', 'weapon', "Deleted weapon with ID: $weapon_id");
+            }
+            
             $_SESSION['message'] = "Weapon deleted successfully";
             $_SESSION['message_type'] = "success";
         } else {
@@ -60,6 +76,9 @@ if ($result->num_rows == 0) {
 
 $weapon = $result->fetch_assoc();
 $cleanWeaponName = cleanItemName($weapon['desc_en']);
+
+// NOW we can include the header that will output HTML
+include '../../../includes/admin_header.php';
 ?>
 
 <section class="hero-section">

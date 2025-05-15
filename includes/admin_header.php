@@ -1,4 +1,14 @@
 <?php 
+// Start session
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    // Not logged in, redirect to login page
+    header("Location: /l1jdb-new/admin/login.php");
+    exit;
+}
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/l1jdb-new/includes/config.php'; 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/l1jdb-new/includes/functions.php'; 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/l1jdb-new/includes/admin_functions.php'; 
@@ -46,6 +56,14 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/l1jdb-new/includes/admin_functions.ph
                             <?php foreach(getCategories() as $category): ?>
                                 <li><a class="dropdown-item" href="/l1jdb-new/admin/<?php echo $category['id']; ?>_list.php"><?php echo $category['name']; ?></a></li>
                             <?php endforeach; ?>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i> <?php echo htmlspecialchars($_SESSION['admin_username']); ?>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="/l1jdb-new/admin/logout.php">Logout</a></li>
                         </ul>
                     </li>
                 </ul>

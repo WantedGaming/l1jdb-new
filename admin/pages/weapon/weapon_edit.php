@@ -1,6 +1,10 @@
-<?php include '../../../includes/admin_header.php'; ?>
-
 <?php
+// Include security check with automatic path detection
+require_once '../../../admin/secure.php';
+
+// Then include the regular header
+include '../../../includes/admin_header.php'; 
+
 // Check if ID is provided
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     $_SESSION['message'] = "No weapon ID specified";

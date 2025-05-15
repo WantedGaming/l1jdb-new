@@ -2,10 +2,8 @@
 // Include modified version of admin_index.php with our new DB management module
 include '../includes/admin_header.php'; 
 
-// Check if session is set for admin
-if (!isset($_SESSION['admin_logged_in'])) {
-    $_SESSION['admin_logged_in'] = true; // For demo purposes, normally would be set at login
-}
+// Remove auto-login code that was here previously
+// Now login is handled properly by the admin_header.php file
 ?>
 
 <!-- Modern Admin Hero Section -->

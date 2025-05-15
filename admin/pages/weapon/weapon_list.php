@@ -1,4 +1,10 @@
-<?php include '../../../includes/admin_header.php'; ?>
+<?php
+// Include security check with automatic path detection
+require_once '../../../admin/secure.php';
+
+// Then include the regular header
+include '../../../includes/admin_header.php'; 
+?>
 
 <section class="hero-section">
     <div class="container">

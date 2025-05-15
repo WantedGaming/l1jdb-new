@@ -1,4 +1,11 @@
-<?php include '../../../includes/admin_header.php'; ?>
+<?php
+// Include security check before anything else
+require_once '../../../includes/admin_security.php';
+requireAdminAuth();
+
+// Then include the regular header
+include '../../../includes/admin_header.php'; 
+?>
 
 <?php
 // Handle form submission

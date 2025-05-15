@@ -41,20 +41,20 @@ function getCategoryImage($category) {
 }
 
 // Function to get category description
-function getCategoryDescription($category) {
+function getCategoryDescription($categoryPath) {
     $descriptions = [
-        'weapons' => 'Browse all weapons including stats, skills, and attributes.',
-        'armor' => 'View all armor pieces, sets, and their protective values.',
-        'items' => 'Explore consumables, quest items, and other miscellaneous objects.',
-        'monsters' => 'Discover monsters, their stats, drops, and spawning locations.',
-        'maps' => 'Navigate through the game world with detailed map information.',
-        'dolls' => 'Learn about magical dolls and their special abilities.',
-        'npcs' => 'Meet the non-player characters that populate the game world.',
-        'skills' => 'Study the various skills and spells available to characters.',
-        'polymorph' => 'Transform into different creatures with polymorph abilities.'
+        'pages/weapon/weapon' => 'Browse all weapons including stats, skills, and attributes.',
+        'pages/armor/armor' => 'View all armor pieces, sets, and their protective values.',
+        'pages/items/items' => 'Explore consumables, quest items, and other miscellaneous objects.',
+        'pages/monsters/monsters' => 'Discover monsters, their stats, drops, and spawning locations.',
+        'pages/maps/maps' => 'Navigate through the game world with detailed map information.',
+        'pages/dolls/dolls' => 'Learn about magical dolls and their special abilities.',
+        'pages/npcs/npcs' => 'Meet the non-player characters that populate the game world.',
+        'pages/skills/skills' => 'Study the various skills and spells available to characters.',
+        'pages/polymorph/polymorph' => 'Transform into different creatures with polymorph abilities.'
     ];
     
-    return $descriptions[$category] ?? 'No description available.';
+    return $descriptions[$categoryPath] ?? 'No description available.';
 }
 
 // Get base URL for assets

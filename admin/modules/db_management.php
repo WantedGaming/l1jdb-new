@@ -1,5 +1,6 @@
 <?php
-// Check if the user is logged in and has admin privileges before including this file
+// The session check is now handled in admin_header.php
+// We don't need a duplicate check here, but we'll keep it safe
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header("Location: /l1jdb-new/admin/login.php");
     exit;

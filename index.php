@@ -4,8 +4,8 @@
 <section class="hero-section">
     <div class="hero-background">
         <picture>
-            <source srcset="assets/img/placeholders/hero-background.webp" type="image/webp">
-            <source srcset="assets/img/placeholders/hero-background.gif" type="image/gif"> 
+            <source srcset="assets/img/placeholders/hero-background.png" type="image/png">
+            <source srcset="assets/img/placeholders/hero-background.webp" type="image/webp"> 
             <img src="images/hero-background.gif" alt="L1J Remastered Game World" class="hero-bg-img">
         </picture>
     </div>

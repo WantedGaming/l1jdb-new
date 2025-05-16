@@ -29,7 +29,7 @@ A PHP/HTML5/CSS/BOOTSTRAP 5 database browser for the L1J Remastered game data wi
         - Armors
         - Etc
     - Admin
-- admin header should similar, but with return or back to site
+- admin header be should similar, but with return or back to site
 - all pages should have hero section with search bar inside
 - index page should have 3 categories cards per row.
 - public index page should match admin dashboard with little differences
@@ -37,6 +37,7 @@ A PHP/HTML5/CSS/BOOTSTRAP 5 database browser for the L1J Remastered game data wi
 - folder structure should be easy to understand, without making it so complex
 - all css should be on external page, NO INLINE CSS
 - all function should be on external page, NO INLINE FUNCTIONS
+- admin should have log files, to view recent activity with the database.  Keep tracking of what has been done and what not.
 - ALWAYS USE SQL DATA FROM DATABASE TO MAKE, UPDATE, EDIT, PAGES.
 - ALWAYS CHECK EXISTING CSS STYLE, FUNCTIONS, BEFORE CREATING NEW ONES
 

@@ -2,6 +2,9 @@
 // Include modified version of admin_index.php with our new DB management module
 include '../includes/admin_header.php'; 
 
+// Make sure we include the admin activity log file
+require_once '../includes/admin_activity_log.php';
+
 // Remove auto-login code that was here previously
 // Now login is handled properly by the admin_header.php file
 ?>
@@ -182,6 +185,18 @@ include '../includes/admin_header.php';
                     </div>
                 </a>
             </div>
+            <!-- Add Admin Activity Log Quick Action -->
+            <div class="col-md-3">
+                <a href="log/admin_activity_log.php" class="card text-decoration-none h-100">
+                    <div class="card-body d-flex flex-column align-items-center text-center">
+                        <div class="mb-3" style="width: 50px; height: 50px; background-color: var(--accent-transparent); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-history" style="color: var(--accent);"></i>
+                        </div>
+                        <h5 class="card-title">Activity Logs</h5>
+                        <p class="card-text small text-white-50">View admin activity history</p>
+                    </div>
+                </a>
+            </div>
         </div>
     </div>
 </section>
@@ -198,55 +213,62 @@ include '../includes/admin_header.php';
 <!-- Recent Activity -->
 <section class="py-4">
     <div class="container">
-        <h2 class="section-title mb-4">Recent Activity</h2>
+        <h2 class="section-title mb-4">
+            Recent Admin Activity
+            <a href="log/admin_activity_log.php?log_type=admin" class="btn btn-sm btn-accent float-end">View All Logs</a>
+        </h2>
         <div class="card">
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>Type</th>
-                            <th>User</th>
-                            <th>Action</th>
-                            <th>Item</th>
                             <th>Time</th>
+                            <th>Admin</th>
+                            <th>Action</th>
+                            <th>Target</th>
+                            <th>Details</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td><span class="badge bg-accent">Edit</span></td>
-                            <td>Admin</td>
-                            <td>Modified weapon stats</td>
-                            <td>Sword of Flames (12345)</td>
-                            <td>5 minutes ago</td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge bg-success">Add</span></td>
-                            <td>Admin</td>
-                            <td>Created new weapon</td>
-                            <td>Staff of Thunder (12346)</td>
-                            <td>15 minutes ago</td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge bg-danger">Delete</span></td>
-                            <td>Admin</td>
-                            <td>Deleted item</td>
-                            <td>Test Item (99999)</td>
-                            <td>25 minutes ago</td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge bg-accent">Edit</span></td>
-                            <td>Admin</td>
-                            <td>Modified monster stats</td>
-                            <td>Dark Elf Wizard (8123)</td>
-                            <td>45 minutes ago</td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge bg-accent">Edit</span></td>
-                            <td>Admin</td>
-                            <td>Modified drop rates</td>
-                            <td>Multiple items</td>
-                            <td>1 hour ago</td>
-                        </tr>
+                        <?php 
+                        // Get the 5 most recent activity logs
+                        $recentLogs = getAdminActivityLogs(5);
+                        
+                        if (empty($recentLogs)): 
+                        ?>
+                            <tr>
+                                <td colspan="5" class="text-center py-3">No recent activity found.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($recentLogs as $log): ?>
+                            <tr>
+                                <td><?php echo date('Y-m-d H:i', strtotime($log['timestamp'])); ?></td>
+                                <td><?php echo htmlspecialchars($log['admin_username']); ?></td>
+                                <td>
+                                    <span class="badge bg-<?php 
+                                        echo $log['action_type'] === 'create' ? 'success' : 
+                                            ($log['action_type'] === 'update' ? 'accent' : 
+                                                ($log['action_type'] === 'delete' ? 'danger' : 
+                                                    ($log['action_type'] === 'login' ? 'primary' : 
+                                                        ($log['action_type'] === 'logout' ? 'secondary' : 'warning')))); 
+                                    ?>">
+                                        <?php echo ucfirst($log['action_type']); ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <?php if (!empty($log['target_table'])): ?>
+                                        <?php echo htmlspecialchars($log['target_table']); ?>
+                                        <?php if (!empty($log['target_id'])): ?>
+                                            <span class="badge bg-dark">#<?php echo htmlspecialchars($log['target_id']); ?></span>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        -
+                                    <?php endif; ?>
+                                </td>
+                                <td><?php echo htmlspecialchars($log['details']); ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

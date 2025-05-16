@@ -68,7 +68,7 @@ function getBaseUrl() {
 function cleanItemName($name) {
     // List of prefixes to remove
     $prefixes = [
-        '\aH', '\aF', '\f4', '\a', '\f', '\H', '\F'
+        '\aH', '\aF', '\f4', '\aG', '\f', '\H', '\F'
     ];
     
     // Remove each prefix from the name

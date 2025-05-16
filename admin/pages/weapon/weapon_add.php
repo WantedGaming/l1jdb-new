@@ -181,6 +181,57 @@ $suggested_id = ($id_row['max_id'] ?? 0) + 1;
             <div class="col-lg-10 text-center hero-content">
                 <h1 class="hero-title">Add <span>New Weapon</span></h1>
                 <p class="hero-subtitle">Create a new weapon in the database</p>
+                
+                <?php
+                // If item_id is set and valid, check for dependencies
+                if (isset($_POST['item_id']) && !empty($_POST['item_id'])) {
+                    $item_id = intval($_POST['item_id']);
+                    
+                    // Check if the ID already exists in weapons
+                    $check_weapon_sql = "SELECT COUNT(*) as count FROM weapon WHERE item_id = $item_id";
+                    $check_weapon_result = $conn->query($check_weapon_sql);
+                    $check_weapon_row = $check_weapon_result->fetch_assoc();
+                    
+                    if ($check_weapon_row['count'] > 0) {
+                        echo '<div class="badge bg-danger mt-2">ID already exists in weapons!</div>';
+                    } else {
+                        // Check droplist
+                        $check_droplist_sql = "SELECT COUNT(*) as drop_count FROM droplist WHERE itemId = $item_id";
+                        $droplist_result = $conn->query($check_droplist_sql);
+                        
+                        if ($droplist_result && $droplist_result->num_rows > 0) {
+                            $droplist_row = $droplist_result->fetch_assoc();
+                            $droplist_count = $droplist_row['drop_count'];
+                            
+                            if ($droplist_count > 0) {
+                                echo '<div class="badge bg-warning mt-2">This ID appears in ' . $droplist_count . ' monster drop tables</div>';
+                            }
+                        }
+                        
+                        // Check if the ID exists in etcitem table
+                        $check_etcitem_sql = "SELECT COUNT(*) as count FROM etcitem WHERE item_id = $item_id";
+                        $check_etcitem_result = $conn->query($check_etcitem_sql);
+                        
+                        if ($check_etcitem_result && $check_etcitem_result->num_rows > 0) {
+                            $check_etcitem_row = $check_etcitem_result->fetch_assoc();
+                            if ($check_etcitem_row['count'] > 0) {
+                                echo '<div class="badge bg-danger mt-2 ms-2">ID exists in etcitem table!</div>';
+                            }
+                        }
+                        
+                        // Check if the ID exists in armor table
+                        $check_armor_sql = "SELECT COUNT(*) as count FROM armor WHERE item_id = $item_id";
+                        $check_armor_result = $conn->query($check_armor_sql);
+                        
+                        if ($check_armor_result && $check_armor_result->num_rows > 0) {
+                            $check_armor_row = $check_armor_result->fetch_assoc();
+                            if ($check_armor_row['count'] > 0) {
+                                echo '<div class="badge bg-danger mt-2 ms-2">ID exists in armor table!</div>';
+                            }
+                        }
+                    }
+                }
+                ?>
             </div>
         </div>
     </div>
@@ -195,6 +246,7 @@ $suggested_id = ($id_row['max_id'] ?? 0) + 1;
                     <a href="weapon_list.php" class="btn btn-sm btn-outline-light">Back to List</a>
                 </div>
             </div>
+            
             <div class="card-body">
                 <?php if (isset($_SESSION['message'])): ?>
                 <div class="alert alert-<?php echo $_SESSION['message_type']; ?> alert-dismissible fade show" role="alert">
@@ -208,418 +260,497 @@ $suggested_id = ($id_row['max_id'] ?? 0) + 1;
                 <?php endif; ?>
                 
                 <form action="" method="POST">
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <div class="mb-3">
-                                <label for="item_id" class="form-label">Item ID</label>
-                                <input type="number" class="form-control filter-select" id="item_id" name="item_id" value="<?php echo $suggested_id; ?>" required>
-                                <small class="text-muted">Suggested ID: <?php echo $suggested_id; ?></small>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="desc_en" class="form-label">Weapon Name</label>
-                                <input type="text" class="form-control filter-select" id="desc_en" name="desc_en" required>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="note" class="form-label">Weapon Description/Note</label>
-                                <textarea class="form-control filter-select" id="note" name="note" rows="3"></textarea>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="itemGrade" class="form-label">Item Grade</label>
-                                <select class="form-control filter-select" id="itemGrade" name="itemGrade" required>
-                                    <option value="NORMAL">Normal</option>
-                                    <option value="ADVANC">Advanced</option>
-                                    <option value="RARE">Rare</option>
-                                    <option value="HERO">Hero</option>
-                                    <option value="LEGEND">Legend</option>
-                                    <option value="MYTH">Myth</option>
-                                    <option value="ONLY">Only</option>
-                                </select>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="type" class="form-label">Weapon Type</label>
-                                <select class="form-control filter-select" id="type" name="type" required>
-                                    <option value="SWORD">Sword</option>
-                                    <option value="DAGGER">Dagger</option>
-                                    <option value="TOHAND_SWORD">Two-Handed Sword</option>
-                                    <option value="BOW">Bow</option>
-                                    <option value="SPEAR">Spear</option>
-                                    <option value="BLUNT">Blunt</option>
-                                    <option value="STAFF">Staff</option>
-                                    <option value="EDORYU">Edoryu</option>
-                                    <option value="CLAW">Claw</option>
-                                    <option value="STING">Sting</option>
-                                    <option value="CHAINSWORD">Chain Sword</option>
-                                </select>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="material" class="form-label">Material</label>
-                                <select class="form-control filter-select" id="material" name="material" required>
-                                    <option value="IRON(철)">Iron</option>
-                                    <option value="STEEL(강철)">Steel</option>
-                                    <option value="WOOD(나무)">Wood</option>
-                                    <option value="SILVER(은)">Silver</option>
-                                    <option value="GOLD(금)">Gold</option>
-                                    <option value="COPPER(구리)">Copper</option>
-                                    <option value="PLATINUM(백금)">Platinum</option>
-                                    <option value="MITHRIL(미스릴)">Mithril</option>
-                                    <option value="PLASTIC(블랙미스릴)">Black Mithril</option>
-                                    <option value="GEMSTONE(보석)">Gemstone</option>
-                                    <option value="ORIHARUKON(오리하루콘)">Oriharukon</option>
-                                    <option value="DRANIUM(드라니움)">Dranium</option>
-                                    <option value="NONE(-)">None</option>
-                                </select>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="weight" class="form-label">Weight</label>
-                                <input type="number" class="form-control filter-select" id="weight" name="weight" value="0" required>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="iconId" class="form-label">Icon ID</label>
-                                    <input type="number" class="form-control filter-select" id="iconId" name="iconId" value="0" required>
+                    <div class="row mb-4">
+                        <!-- Weapon Image Card -->
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Weapon Image</h5>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="spriteId" class="form-label">Sprite ID</label>
-                                    <input type="number" class="form-control filter-select" id="spriteId" name="spriteId" value="0" required>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="dmg_small" class="form-label">Damage (Small)</label>
-                                    <input type="number" class="form-control filter-select" id="dmg_small" name="dmg_small" value="0" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="dmg_large" class="form-label">Damage (Large)</label>
-                                    <input type="number" class="form-control filter-select" id="dmg_large" name="dmg_large" value="0" required>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="safenchant" class="form-label">Safe Enchant</label>
-                                <input type="number" class="form-control filter-select" id="safenchant" name="safenchant" value="0" required>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="hitmodifier" class="form-label">Hit Modifier</label>
-                                    <input type="number" class="form-control filter-select" id="hitmodifier" name="hitmodifier" value="0" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="dmgmodifier" class="form-label">Damage Modifier</label>
-                                    <input type="number" class="form-control filter-select" id="dmgmodifier" name="dmgmodifier" value="0" required>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="double_dmg_chance" class="form-label">Double Damage Chance (%)</label>
-                                <input type="number" class="form-control filter-select" id="double_dmg_chance" name="double_dmg_chance" value="0" required>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="min_lvl" class="form-label">Min Level</label>
-                                    <input type="number" class="form-control filter-select" id="min_lvl" name="min_lvl" value="0" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="max_lvl" class="form-label">Max Level</label>
-                                    <input type="number" class="form-control filter-select" id="max_lvl" name="max_lvl" value="0" required>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="magicdmgmodifier" class="form-label">Magic Damage Modifier</label>
-                                <input type="number" class="form-control filter-select" id="magicdmgmodifier" name="magicdmgmodifier" value="0" required>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="max_use_time" class="form-label">Max Use Time (seconds, 0 for unlimited)</label>
-                                <input type="number" class="form-control filter-select" id="max_use_time" name="max_use_time" value="0" required>
-                            </div>
-                            
-                            <div class="row mb-3">
-                                <div class="col-md-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="1" id="bless" name="bless">
-                                        <label class="form-check-label" for="bless">
-                                            Bless
-                                        </label>
+                                <div class="card-body text-center">
+                                    <div class="weapon-image-container">
+                                        <img src="/l1jdb-new/assets/img/icons/9175.png" 
+                                             alt="Default Weapon Image" 
+                                             class="weapon-image" 
+                                             id="weapon-preview">
                                     </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="1" id="trade" name="trade" checked>
-                                        <label class="form-check-label" for="trade">
-                                            Tradeable
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="1" id="cant_delete" name="cant_delete">
-                                        <label class="form-check-label" for="cant_delete">
-                                            Can't Delete
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="1" id="cant_sell" name="cant_sell">
-                                        <label class="form-check-label" for="cant_sell">
-                                            Can't Sell
-                                        </label>
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <label for="iconId" class="form-label">Icon ID</label>
+                                            <input type="number" class="form-control filter-select" id="iconId" name="iconId" value="0" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="spriteId" class="form-label">Sprite ID</label>
+                                            <input type="number" class="form-control filter-select" id="spriteId" name="spriteId" value="0" required>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="col-md-6 mb-4">
-                            <h5 class="mb-3">Stat Bonuses</h5>
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label for="add_str" class="form-label">STR</label>
-                                    <input type="number" class="form-control filter-select" id="add_str" name="add_str" value="0" required>
+                        <!-- Basic Information Card -->
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Basic Information</h5>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="add_dex" class="form-label">DEX</label>
-                                    <input type="number" class="form-control filter-select" id="add_dex" name="add_dex" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="add_con" class="form-label">CON</label>
-                                    <input type="number" class="form-control filter-select" id="add_con" name="add_con" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="add_int" class="form-label">INT</label>
-                                    <input type="number" class="form-control filter-select" id="add_int" name="add_int" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="add_wis" class="form-label">WIS</label>
-                                    <input type="number" class="form-control filter-select" id="add_wis" name="add_wis" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="add_cha" class="form-label">CHA</label>
-                                    <input type="number" class="form-control filter-select" id="add_cha" name="add_cha" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="add_hp" class="form-label">HP</label>
-                                    <input type="number" class="form-control filter-select" id="add_hp" name="add_hp" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="add_mp" class="form-label">MP</label>
-                                    <input type="number" class="form-control filter-select" id="add_mp" name="add_mp" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="add_hpr" class="form-label">HP Regen</label>
-                                    <input type="number" class="form-control filter-select" id="add_hpr" name="add_hpr" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="add_mpr" class="form-label">MP Regen</label>
-                                    <input type="number" class="form-control filter-select" id="add_mpr" name="add_mpr" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="add_sp" class="form-label">SP</label>
-                                    <input type="number" class="form-control filter-select" id="add_sp" name="add_sp" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="m_def" class="form-label">M. Def</label>
-                                    <input type="number" class="form-control filter-select" id="m_def" name="m_def" value="0" required>
-                                </div>
-                            </div>
-                            
-                            <h5 class="mb-3">Resistances</h5>
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label for="regist_skill" class="form-label">Skill</label>
-                                    <input type="number" class="form-control filter-select" id="regist_skill" name="regist_skill" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="regist_spirit" class="form-label">Spirit</label>
-                                    <input type="number" class="form-control filter-select" id="regist_spirit" name="regist_spirit" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="regist_dragon" class="form-label">Dragon</label>
-                                    <input type="number" class="form-control filter-select" id="regist_dragon" name="regist_dragon" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="regist_fear" class="form-label">Fear</label>
-                                    <input type="number" class="form-control filter-select" id="regist_fear" name="regist_fear" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="regist_all" class="form-label">All</label>
-                                    <input type="number" class="form-control filter-select" id="regist_all" name="regist_all" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <div class="form-check mt-4">
-                                        <input class="form-check-input" type="checkbox" value="true" id="poisonRegist" name="poisonRegist">
-                                        <label class="form-check-label" for="poisonRegist">
-                                            Poison Resist
-                                        </label>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="item_id" class="form-label">Item ID</label>
+                                        <input type="number" class="form-control filter-select" id="item_id" name="item_id" value="<?php echo $suggested_id; ?>" required>
+                                        <small class="text-muted">Suggested ID: <?php echo $suggested_id; ?></small>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="desc_en" class="form-label">Weapon Name</label>
+                                        <input type="text" class="form-control filter-select" id="desc_en" name="desc_en" required>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="note" class="form-label">Weapon Description/Note</label>
+                                        <textarea class="form-control filter-select" id="note" name="note" rows="3"></textarea>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="itemGrade" class="form-label">Item Grade</label>
+                                            <select class="form-control filter-select" id="itemGrade" name="itemGrade" required>
+                                                <option value="NORMAL">Normal</option>
+                                                <option value="ADVANC">Advanced</option>
+                                                <option value="RARE">Rare</option>
+                                                <option value="HERO">Hero</option>
+                                                <option value="LEGEND">Legend</option>
+                                                <option value="MYTH">Myth</option>
+                                                <option value="ONLY">Only</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="weight" class="form-label">Weight</label>
+                                            <input type="number" class="form-control filter-select" id="weight" name="weight" value="0" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="max_use_time" class="form-label">Max Use Time (seconds, 0 for unlimited)</label>
+                                        <input type="number" class="form-control filter-select" id="max_use_time" name="max_use_time" value="0" required>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="1" id="bless" name="bless">
+                                                <label class="form-check-label" for="bless">Bless</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="1" id="trade" name="trade" checked>
+                                                <label class="form-check-label" for="trade">Tradeable</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="1" id="cant_delete" name="cant_delete">
+                                                <label class="form-check-label" for="cant_delete">Can't Delete</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="1" id="cant_sell" name="cant_sell">
+                                                <label class="form-check-label" for="cant_sell">Can't Sell</label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <h5 class="mb-3">Hit Modifiers</h5>
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label for="hitup_skill" class="form-label">Skill</label>
-                                    <input type="number" class="form-control filter-select" id="hitup_skill" name="hitup_skill" value="0" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <!-- Weapon Properties Card -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Weapon Properties</h5>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="hitup_spirit" class="form-label">Spirit</label>
-                                    <input type="number" class="form-control filter-select" id="hitup_spirit" name="hitup_spirit" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="hitup_dragon" class="form-label">Dragon</label>
-                                    <input type="number" class="form-control filter-select" id="hitup_dragon" name="hitup_dragon" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="hitup_fear" class="form-label">Fear</label>
-                                    <input type="number" class="form-control filter-select" id="hitup_fear" name="hitup_fear" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="hitup_all" class="form-label">All</label>
-                                    <input type="number" class="form-control filter-select" id="hitup_all" name="hitup_all" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="hitup_magic" class="form-label">Magic</label>
-                                    <input type="number" class="form-control filter-select" id="hitup_magic" name="hitup_magic" value="0" required>
-                                </div>
-                            </div>
-                            
-                            <h5 class="mb-3">PVP & Critical Stats</h5>
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label for="shortCritical" class="form-label">Short Critical</label>
-                                    <input type="number" class="form-control filter-select" id="shortCritical" name="shortCritical" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="longCritical" class="form-label">Long Critical</label>
-                                    <input type="number" class="form-control filter-select" id="longCritical" name="longCritical" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="magicCritical" class="form-label">Magic Critical</label>
-                                    <input type="number" class="form-control filter-select" id="magicCritical" name="magicCritical" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="expBonus" class="form-label">Exp Bonus (%)</label>
-                                    <input type="number" class="form-control filter-select" id="expBonus" name="expBonus" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="PVPDamage" class="form-label">PVP Damage</label>
-                                    <input type="number" class="form-control filter-select" id="PVPDamage" name="PVPDamage" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="PVPDamagePercent" class="form-label">PVP Damage %</label>
-                                    <input type="number" class="form-control filter-select" id="PVPDamagePercent" name="PVPDamagePercent" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="PVPDamageReduction" class="form-label">PVP DMG Reduction</label>
-                                    <input type="number" class="form-control filter-select" id="PVPDamageReduction" name="PVPDamageReduction" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="PVPDamageReductionPercent" class="form-label">PVP DMG Reduction %</label>
-                                    <input type="number" class="form-control filter-select" id="PVPDamageReductionPercent" name="PVPDamageReductionPercent" value="0" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="PVPMagicDamageReduction" class="form-label">PVP Magic DMG Reduction</label>
-                                    <input type="number" class="form-control filter-select" id="PVPMagicDamageReduction" name="PVPMagicDamageReduction" value="0" required>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="type" class="form-label">Weapon Type</label>
+                                        <select class="form-control filter-select" id="type" name="type" required>
+                                            <option value="SWORD">Sword</option>
+                                            <option value="DAGGER">Dagger</option>
+                                            <option value="TOHAND_SWORD">Two-Handed Sword</option>
+                                            <option value="BOW">Bow</option>
+                                            <option value="SPEAR">Spear</option>
+                                            <option value="BLUNT">Blunt</option>
+                                            <option value="STAFF">Staff</option>
+                                            <option value="EDORYU">Edoryu</option>
+                                            <option value="CLAW">Claw</option>
+                                            <option value="STING">Sting</option>
+                                            <option value="CHAINSWORD">Chain Sword</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="material" class="form-label">Material</label>
+                                        <select class="form-control filter-select" id="material" name="material" required>
+                                            <option value="IRON(철)">Iron</option>
+                                            <option value="STEEL(강철)">Steel</option>
+                                            <option value="WOOD(나무)">Wood</option>
+                                            <option value="SILVER(은)">Silver</option>
+                                            <option value="GOLD(금)">Gold</option>
+                                            <option value="COPPER(구리)">Copper</option>
+                                            <option value="PLATINUM(백금)">Platinum</option>
+                                            <option value="MITHRIL(미스릴)">Mithril</option>
+                                            <option value="PLASTIC(블랙미스릴)">Black Mithril</option>
+                                            <option value="GEMSTONE(보석)">Gemstone</option>
+                                            <option value="ORIHARUKON(오리하루콘)">Oriharukon</option>
+                                            <option value="DRANIUM(드라니움)">Dranium</option>
+                                            <option value="NONE(-)">None</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="min_lvl" class="form-label">Min Level</label>
+                                            <input type="number" class="form-control filter-select" id="min_lvl" name="min_lvl" value="0" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="max_lvl" class="form-label">Max Level</label>
+                                            <input type="number" class="form-control filter-select" id="max_lvl" name="max_lvl" value="0" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" value="1" id="haste_item" name="haste_item">
+                                        <label class="form-check-label" for="haste_item">Haste Item</label>
+                                    </div>
                                 </div>
                             </div>
-                            
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" value="1" id="haste_item" name="haste_item">
-                                <label class="form-check-label" for="haste_item">
-                                    Haste Item
-                                </label>
+                        </div>
+                        
+                        <!-- Combat Stats Card -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Combat Stats</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="dmg_small" class="form-label">Damage (Small)</label>
+                                            <input type="number" class="form-control filter-select" id="dmg_small" name="dmg_small" value="0" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="dmg_large" class="form-label">Damage (Large)</label>
+                                            <input type="number" class="form-control filter-select" id="dmg_large" name="dmg_large" value="0" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="double_dmg_chance" class="form-label">Double Damage Chance (%)</label>
+                                        <input type="number" class="form-control filter-select" id="double_dmg_chance" name="double_dmg_chance" value="0" required>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="hitmodifier" class="form-label">Hit Modifier</label>
+                                            <input type="number" class="form-control filter-select" id="hitmodifier" name="hitmodifier" value="0" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="dmgmodifier" class="form-label">Damage Modifier</label>
+                                            <input type="number" class="form-control filter-select" id="dmgmodifier" name="dmgmodifier" value="0" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="magicdmgmodifier" class="form-label">Magic Damage Modifier</label>
+                                        <input type="number" class="form-control filter-select" id="magicdmgmodifier" name="magicdmgmodifier" value="0" required>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="safenchant" class="form-label">Safe Enchant</label>
+                                        <input type="number" class="form-control filter-select" id="safenchant" name="safenchant" value="0" required>
+                                    </div>
+                                </div>
                             </div>
-                            
-                            <h5 class="mb-3">Class Restrictions</h5>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <!-- Stat Bonuses Card -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Stat Bonuses</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="add_str" class="form-label">STR</label>
+                                            <input type="number" class="form-control filter-select" id="add_str" name="add_str" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="add_dex" class="form-label">DEX</label>
+                                            <input type="number" class="form-control filter-select" id="add_dex" name="add_dex" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="add_con" class="form-label">CON</label>
+                                            <input type="number" class="form-control filter-select" id="add_con" name="add_con" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="add_int" class="form-label">INT</label>
+                                            <input type="number" class="form-control filter-select" id="add_int" name="add_int" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="add_wis" class="form-label">WIS</label>
+                                            <input type="number" class="form-control filter-select" id="add_wis" name="add_wis" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="add_cha" class="form-label">CHA</label>
+                                            <input type="number" class="form-control filter-select" id="add_cha" name="add_cha" value="0" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="add_hp" class="form-label">HP</label>
+                                            <input type="number" class="form-control filter-select" id="add_hp" name="add_hp" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="add_mp" class="form-label">MP</label>
+                                            <input type="number" class="form-control filter-select" id="add_mp" name="add_mp" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="add_sp" class="form-label">SP</label>
+                                            <input type="number" class="form-control filter-select" id="add_sp" name="add_sp" value="0" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="add_hpr" class="form-label">HP Regen</label>
+                                            <input type="number" class="form-control filter-select" id="add_hpr" name="add_hpr" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="add_mpr" class="form-label">MP Regen</label>
+                                            <input type="number" class="form-control filter-select" id="add_mpr" name="add_mpr" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="m_def" class="form-label">M. Def</label>
+                                            <input type="number" class="form-control filter-select" id="m_def" name="m_def" value="0" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- PVP & Critical Stats Card -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">PVP & Critical Stats</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="shortCritical" class="form-label">Short Critical</label>
+                                            <input type="number" class="form-control filter-select" id="shortCritical" name="shortCritical" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="longCritical" class="form-label">Long Critical</label>
+                                            <input type="number" class="form-control filter-select" id="longCritical" name="longCritical" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="magicCritical" class="form-label">Magic Critical</label>
+                                            <input type="number" class="form-control filter-select" id="magicCritical" name="magicCritical" value="0" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="expBonus" class="form-label">Exp Bonus (%)</label>
+                                        <input type="number" class="form-control filter-select" id="expBonus" name="expBonus" value="0" required>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="PVPDamage" class="form-label">PVP Damage</label>
+                                            <input type="number" class="form-control filter-select" id="PVPDamage" name="PVPDamage" value="0" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="PVPDamagePercent" class="form-label">PVP Damage %</label>
+                                            <input type="number" class="form-control filter-select" id="PVPDamagePercent" name="PVPDamagePercent" value="0" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="PVPDamageReduction" class="form-label">PVP DMG Reduction</label>
+                                            <input type="number" class="form-control filter-select" id="PVPDamageReduction" name="PVPDamageReduction" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="PVPDamageReductionPercent" class="form-label">PVP DMG Reduction %</label>
+                                            <input type="number" class="form-control filter-select" id="PVPDamageReductionPercent" name="PVPDamageReductionPercent" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="PVPMagicDamageReduction" class="form-label">PVP Magic DMG Reduction</label>
+                                            <input type="number" class="form-control filter-select" id="PVPMagicDamageReduction" name="PVPMagicDamageReduction" value="0" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <!-- Resistances Card -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Resistances</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="regist_skill" class="form-label">Skill</label>
+                                            <input type="number" class="form-control filter-select" id="regist_skill" name="regist_skill" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="regist_spirit" class="form-label">Spirit</label>
+                                            <input type="number" class="form-control filter-select" id="regist_spirit" name="regist_spirit" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="regist_dragon" class="form-label">Dragon</label>
+                                            <input type="number" class="form-control filter-select" id="regist_dragon" name="regist_dragon" value="0" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="regist_fear" class="form-label">Fear</label>
+                                            <input type="number" class="form-control filter-select" id="regist_fear" name="regist_fear" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="regist_all" class="form-label">All</label>
+                                            <input type="number" class="form-control filter-select" id="regist_all" name="regist_all" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="form-check mt-4">
+                                                <input class="form-check-input" type="checkbox" value="true" id="poisonRegist" name="poisonRegist">
+                                                <label class="form-check-label" for="poisonRegist">Poison Resist</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Hit Modifiers Card -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Hit Modifiers</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="hitup_skill" class="form-label">Skill</label>
+                                            <input type="number" class="form-control filter-select" id="hitup_skill" name="hitup_skill" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="hitup_spirit" class="form-label">Spirit</label>
+                                            <input type="number" class="form-control filter-select" id="hitup_spirit" name="hitup_spirit" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="hitup_dragon" class="form-label">Dragon</label>
+                                            <input type="number" class="form-control filter-select" id="hitup_dragon" name="hitup_dragon" value="0" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="hitup_fear" class="form-label">Fear</label>
+                                            <input type="number" class="form-control filter-select" id="hitup_fear" name="hitup_fear" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="hitup_all" class="form-label">All</label>
+                                            <input type="number" class="form-control filter-select" id="hitup_all" name="hitup_all" value="0" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="hitup_magic" class="form-label">Magic</label>
+                                            <input type="number" class="form-control filter-select" id="hitup_magic" name="hitup_magic" value="0" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Class Restrictions Card -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Class Restrictions</h5>
+                        </div>
+                        <div class="card-body">
                             <div class="row">
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-2 col-4 mb-3">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="1" id="use_royal" name="use_royal" checked>
-                                        <label class="form-check-label" for="use_royal">
-                                            Royal
-                                        </label>
+                                        <label class="form-check-label" for="use_royal">Royal</label>
                                     </div>
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-2 col-4 mb-3">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="1" id="use_knight" name="use_knight" checked>
-                                        <label class="form-check-label" for="use_knight">
-                                            Knight
-                                        </label>
+                                        <label class="form-check-label" for="use_knight">Knight</label>
                                     </div>
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-2 col-4 mb-3">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="1" id="use_mage" name="use_mage" checked>
-                                        <label class="form-check-label" for="use_mage">
-                                            Mage
-                                        </label>
+                                        <label class="form-check-label" for="use_mage">Mage</label>
                                     </div>
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-2 col-4 mb-3">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="1" id="use_elf" name="use_elf" checked>
-                                        <label class="form-check-label" for="use_elf">
-                                            Elf
-                                        </label>
+                                        <label class="form-check-label" for="use_elf">Elf</label>
                                     </div>
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-2 col-4 mb-3">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="1" id="use_darkelf" name="use_darkelf" checked>
-                                        <label class="form-check-label" for="use_darkelf">
-                                            Dark Elf
-                                        </label>
+                                        <label class="form-check-label" for="use_darkelf">Dark Elf</label>
                                     </div>
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-2 col-4 mb-3">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="1" id="use_dragonknight" name="use_dragonknight" checked>
-                                        <label class="form-check-label" for="use_dragonknight">
-                                            Dragon Knight
-                                        </label>
+                                        <label class="form-check-label" for="use_dragonknight">Dragon Knight</label>
                                     </div>
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-2 col-4 mb-3">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="1" id="use_illusionist" name="use_illusionist" checked>
-                                        <label class="form-check-label" for="use_illusionist">
-                                            Illusionist
-                                        </label>
+                                        <label class="form-check-label" for="use_illusionist">Illusionist</label>
                                     </div>
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-2 col-4 mb-3">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="1" id="use_warrior" name="use_warrior" checked>
-                                        <label class="form-check-label" for="use_warrior">
-                                            Warrior
-                                        </label>
+                                        <label class="form-check-label" for="use_warrior">Warrior</label>
                                     </div>
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-2 col-4 mb-3">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="1" id="use_fencer" name="use_fencer" checked>
-                                        <label class="form-check-label" for="use_fencer">
-                                            Fencer
-                                        </label>
+                                        <label class="form-check-label" for="use_fencer">Fencer</label>
                                     </div>
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-2 col-4 mb-3">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="1" id="use_lancer" name="use_lancer" checked>
-                                        <label class="form-check-label" for="use_lancer">
-                                            Lancer
-                                        </label>
+                                        <label class="form-check-label" for="use_lancer">Lancer</label>
                                     </div>
                                 </div>
                             </div>
@@ -635,5 +766,51 @@ $suggested_id = ($id_row['max_id'] ?? 0) + 1;
         </div>
     </div>
 </section>
+
+<script>
+// Add live preview for weapon icon with enhanced functionality
+let iconUpdateTimeout;
+
+document.getElementById('iconId').addEventListener('input', function() {
+    // Clear any pending updates
+    clearTimeout(iconUpdateTimeout);
+    
+    const iconIdVal = this.value;
+    const imgElement = document.getElementById('weapon-preview');
+    
+    // Show loading indicator
+    imgElement.classList.add('opacity-50');
+    
+    // Set a small timeout to avoid rapid image requests while typing
+    iconUpdateTimeout = setTimeout(() => {
+        if (iconIdVal) {
+            imgElement.src = `/l1jdb-new/assets/img/icons/${iconIdVal}.png`;
+            imgElement.onerror = function() {
+                this.src = '/l1jdb-new/assets/img/icons/9175.png';
+                imgElement.classList.remove('opacity-50');
+            };
+            imgElement.onload = function() {
+                imgElement.classList.remove('opacity-50');
+            };
+        } else {
+            // If iconId is empty, show default
+            imgElement.src = '/l1jdb-new/assets/img/icons/9175.png';
+            imgElement.classList.remove('opacity-50');
+        }
+    }, 300); // 300ms debounce delay
+});
+
+// Initialize icon on page load
+window.addEventListener('DOMContentLoaded', function() {
+    const iconIdVal = document.getElementById('iconId').value;
+    if (iconIdVal) {
+        const imgElement = document.getElementById('weapon-preview');
+        imgElement.src = `/l1jdb-new/assets/img/icons/${iconIdVal}.png`;
+        imgElement.onerror = function() {
+            this.src = '/l1jdb-new/assets/img/icons/9175.png';
+        };
+    }
+});
+</script>
 
 <?php include '../../../includes/admin_footer.php'; ?>

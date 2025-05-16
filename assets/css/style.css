@@ -724,6 +724,15 @@ textarea.form-control {
     margin-bottom: 0;
 }
 
+.full-table-container {
+    overflow: visible;
+    max-height: none;
+}
+.full-table-container .table-responsive {
+    overflow: visible;
+    max-height: none;
+}
+
 .table th {
     background: linear-gradient(to bottom, rgba(15, 15, 15, 0.95), rgba(8, 8, 8, 0.95));
     padding: 1.2rem 1rem;

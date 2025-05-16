@@ -1,6 +1,8 @@
 <?php 
-// Start session
-session_start();
+// Start session only if one doesn't already exist
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Check if user is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {

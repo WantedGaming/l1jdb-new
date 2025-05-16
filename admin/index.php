@@ -126,6 +126,18 @@ include '../includes/admin_header.php';
     <div class="container">
         <h2 class="section-title mb-4">Quick Actions</h2>
         <div class="row g-3">
+			<!-- In the Quick Actions section (around line 120) -->
+			<div class="col-md-3">
+				<a href="pages/tools/gm_commands.php" class="card text-decoration-none h-100">
+					<div class="card-body d-flex flex-column align-items-center text-center">
+						<div class="mb-3" style="width: 50px; height: 50px; background-color: var(--accent-transparent); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+							<i class="fas fa-terminal" style="color: var(--accent);"></i>
+						</div>
+						<h5 class="card-title">GM Commands</h5>
+						<p class="card-text small text-white-50">Reference for all admin commands</p>
+					</div>
+				</a>
+			</div>
             <div class="col-md-3">
                 <a href="backup.php" class="card text-decoration-none h-100">
                     <div class="card-body d-flex flex-column align-items-center text-center">

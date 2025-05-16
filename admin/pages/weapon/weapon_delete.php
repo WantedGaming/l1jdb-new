@@ -10,7 +10,65 @@ require_once '../../../includes/admin_security.php';
 // Verify authentication
 requireAdminAuth();
 
-// Process all logic that might use header() redirects BEFORE including the header
+// Define function for weapon deletion with droplist cleanup
+function deleteWeaponAndDependencies($conn, $weapon_id, $remove_from_droplist = false) {
+    // Start transaction
+    $conn->begin_transaction();
+    $success = true;
+    $message_details = [];
+    
+    try {
+        // If removing from droplist is chosen
+        if ($remove_from_droplist) {
+            // Count first for the message
+            $count_sql = "SELECT COUNT(*) as count FROM droplist WHERE itemId = ?";
+            $count_stmt = $conn->prepare($count_sql);
+            $count_stmt->bind_param("i", $weapon_id);
+            $count_stmt->execute();
+            $count_result = $count_stmt->get_result();
+            $count_row = $count_result->fetch_assoc();
+            $droplist_count = $count_row['count'];
+            $count_stmt->close();
+            
+            // Now delete
+            if ($droplist_count > 0) {
+                $delete_droplist_sql = "DELETE FROM droplist WHERE itemId = ?";
+                $delete_droplist_stmt = $conn->prepare($delete_droplist_sql);
+                $delete_droplist_stmt->bind_param("i", $weapon_id);
+                $delete_droplist_stmt->execute();
+                
+                if ($delete_droplist_stmt->affected_rows > 0) {
+                    $message_details[] = "Removed from $droplist_count droplist entries";
+                }
+                $delete_droplist_stmt->close();
+            }
+        }
+        
+        // Delete the weapon
+        $delete_weapon_sql = "DELETE FROM weapon WHERE item_id = ?";
+        $delete_weapon_stmt = $conn->prepare($delete_weapon_sql);
+        $delete_weapon_stmt->bind_param("i", $weapon_id);
+        $delete_weapon_stmt->execute();
+        
+        if ($delete_weapon_stmt->affected_rows > 0) {
+            $message_details[] = "Weapon deleted successfully";
+        } else {
+            // If weapon wasn't deleted, rollback
+            throw new Exception("Failed to delete weapon");
+        }
+        
+        $delete_weapon_stmt->close();
+        
+        // If we got this far, commit the transaction
+        $conn->commit();
+        return [true, $message_details];
+        
+    } catch (Exception $e) {
+        // Something went wrong, rollback
+        $conn->rollback();
+        return [false, [$e->getMessage()]];
+    }
+}
 
 // Check if ID is provided
 if (!isset($_GET['id']) || empty($_GET['id'])) {
@@ -21,47 +79,6 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 }
 
 $weapon_id = intval($_GET['id']);
-
-// If confirmation is received
-if (isset($_POST['confirm_delete']) && $_POST['confirm_delete'] == 'yes') {
-    // Check if there are any references to this weapon in other tables
-    $check_sql = "SELECT COUNT(*) as count FROM droplist WHERE itemId = $weapon_id";
-    $check_result = $conn->query($check_sql);
-    $check_row = $check_result->fetch_assoc();
-    
-    $weapon_in_use = $check_row['count'] > 0;
-    
-    // Also check weapon_skill if the table exists
-    $skill_check_sql = "SELECT COUNT(*) as count FROM weapon_skill WHERE weapon_id = $weapon_id";
-    $skill_check_result = $conn->query($skill_check_sql);
-    if ($skill_check_result) {
-        $skill_check_row = $skill_check_result->fetch_assoc();
-        $weapon_in_use = $weapon_in_use || ($skill_check_row['count'] > 0);
-    }
-    
-    if ($weapon_in_use) {
-        $_SESSION['message'] = "Cannot delete this weapon because it is referenced in other tables (droplist or weapon_skill).";
-        $_SESSION['message_type'] = "danger";
-    } else {
-        // Delete the weapon
-        $delete_sql = "DELETE FROM weapon WHERE item_id = $weapon_id";
-        if ($conn->query($delete_sql)) {
-            // Log the activity
-            if (function_exists('logAdminActivity')) {
-                logAdminActivity('delete', 'weapon', "Deleted weapon with ID: $weapon_id");
-            }
-            
-            $_SESSION['message'] = "Weapon deleted successfully";
-            $_SESSION['message_type'] = "success";
-        } else {
-            $_SESSION['message'] = "Error deleting weapon: " . $conn->error;
-            $_SESSION['message_type'] = "danger";
-        }
-    }
-    
-    header("Location: weapon_list.php");
-    exit;
-}
 
 // Fetch weapon details for confirmation
 $sql = "SELECT item_id, desc_en, type, iconId, itemGrade FROM weapon WHERE item_id = $weapon_id";
@@ -76,6 +93,64 @@ if ($result->num_rows == 0) {
 
 $weapon = $result->fetch_assoc();
 $cleanWeaponName = cleanItemName($weapon['desc_en']);
+
+// Check if the weapon is in droplist
+$check_droplist_sql = "SELECT COUNT(*) as drop_count FROM droplist WHERE itemId = $weapon_id";
+$droplist_result = $conn->query($check_droplist_sql);
+$is_in_droplist = false;
+$drop_count = 0;
+
+if ($droplist_result && $droplist_result->num_rows > 0) {
+    $droplist_row = $droplist_result->fetch_assoc();
+    $drop_count = $droplist_row['drop_count'];
+    $is_in_droplist = ($drop_count > 0);
+}
+
+// Check if weapon is associated with weapon_skill
+$is_in_weapon_skill = false;
+$weapon_skill_check_sql = "SELECT COUNT(*) as count FROM weapon_skill WHERE weapon_id = $weapon_id";
+$weapon_skill_result = $conn->query($weapon_skill_check_sql);
+if ($weapon_skill_result) {
+    $weapon_skill_row = $weapon_skill_result->fetch_assoc();
+    $is_in_weapon_skill = ($weapon_skill_row['count'] > 0);
+}
+
+// Process deletion request
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['confirm_delete'])) {
+    $remove_from_droplist = isset($_POST['remove_from_droplist']) && $_POST['remove_from_droplist'] == 'yes';
+    
+    // If the weapon is in droplist and we don't want to remove it, or if it's in weapon_skill
+    // then we should not proceed with deletion
+    if (($is_in_droplist && !$remove_from_droplist) || $is_in_weapon_skill) {
+        $_SESSION['message'] = "Cannot delete this weapon because it has dependencies that weren't addressed.";
+        if ($is_in_droplist && !$remove_from_droplist) {
+            $_SESSION['message'] .= " Remove it from the droplist first.";
+        }
+        if ($is_in_weapon_skill) {
+            $_SESSION['message'] .= " It is associated with weapon skills.";
+        }
+        $_SESSION['message_type'] = "danger";
+    } else {
+        // Proceed with deletion
+        list($success, $details) = deleteWeaponAndDependencies($conn, $weapon_id, $remove_from_droplist);
+        
+        if ($success) {
+            $_SESSION['message'] = implode(", ", $details);
+            $_SESSION['message_type'] = "success";
+            
+            // Log the activity
+            if (function_exists('logAdminActivity')) {
+                logAdminActivity('delete', 'weapon', "Deleted weapon with ID: $weapon_id");
+            }
+            
+            header("Location: weapon_list.php");
+            exit;
+        } else {
+            $_SESSION['message'] = "Error: " . implode(", ", $details);
+            $_SESSION['message_type'] = "danger";
+        }
+    }
+}
 
 // NOW we can include the header that will output HTML
 include '../../../includes/admin_header.php';
@@ -95,15 +170,16 @@ include '../../../includes/admin_header.php';
 <section class="py-5">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Confirm Deletion</h5>
                         <div>
                             <a href="weapon_list.php" class="btn btn-sm btn-outline-light">Back to List</a>
-                            <a href="../../pages/weapon/weapon_detail.php?id=<?php echo $weapon_id; ?>" class="btn btn-sm btn-outline-accent" target="_blank">View Details</a>
+                            <a href="../../../pages/weapon/weapon_detail.php?id=<?php echo $weapon_id; ?>" class="btn btn-sm btn-outline-accent" target="_blank">View Details</a>
                         </div>
                     </div>
+                    
                     <div class="card-body">
                         <?php if (isset($_SESSION['message'])): ?>
                         <div class="alert alert-<?php echo $_SESSION['message_type']; ?> alert-dismissible fade show" role="alert">
@@ -116,51 +192,119 @@ include '../../../includes/admin_header.php';
                         </div>
                         <?php endif; ?>
                         
-                        <div class="text-center mb-4">
-                            <img src="/l1jdb-new/assets/img/icons/<?php echo $weapon['iconId']; ?>.png" 
-                                 alt="<?php echo htmlspecialchars($cleanWeaponName); ?>" 
-                                 class="weapon-image" 
-                                 style="max-height: 128px; max-width: 128px;" 
-                                 onerror="this.src='/l1jdb-new/assets/img/icons/9175.png';">
-                        </div>
-                        
-                        <div class="alert alert-danger text-center">
-                            <p class="mb-0"><strong>Warning:</strong> You are about to delete the following weapon:</p>
-                            <h4 class="mt-2"><?php echo htmlspecialchars($cleanWeaponName); ?></h4>
-                            <p class="mb-0">
-                                ID: <?php echo $weapon['item_id']; ?>, 
-                                Type: <?php echo normalizeText($weapon['type']); ?>, 
-                                Grade: <?php echo $weapon['itemGrade']; ?>
-                            </p>
-                            <p class="mt-3 mb-0">This action cannot be undone!</p>
-                        </div>
-                        
-                        <form action="" method="POST" class="mt-4">
-                            <input type="hidden" name="confirm_delete" value="yes">
+                        <div class="row mb-4">
+                            <div class="col-md-5">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Weapon Image</h5>
+                                    </div>
+                                    <div class="card-body text-center">
+                                        <div class="weapon-image-container">
+                                            <img src="/l1jdb-new/assets/img/icons/<?php echo $weapon['iconId']; ?>.png" 
+                                                 alt="<?php echo htmlspecialchars($cleanWeaponName); ?>" 
+                                                 class="weapon-image" 
+                                                 onerror="this.src='/l1jdb-new/assets/img/icons/9175.png';">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                                <a href="weapon_list.php" class="btn btn-outline-light">Cancel</a>
-                                <button type="submit" class="btn btn-danger">Delete Weapon</button>
-                            </div>
-                        </form>
-                        
-                        <div class="mt-4">
-                            <div class="card bg-dark">
-                                <div class="card-header">
-                                    <h6 class="mb-0">Before Deleting</h6>
-                                </div>
-                                <div class="card-body">
-                                    <p>Make sure this weapon is not:</p>
-                                    <ul>
-                                        <li>Used in monster drop tables</li>
-                                        <li>Associated with weapon skills</li>
-                                        <li>Referenced in quests or other game systems</li>
-                                        <li>Equipped by players in the game</li>
-                                    </ul>
-                                    <p class="mb-0">Deleting a weapon that is still in use can cause game issues.</p>
+                            <div class="col-md-7">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Weapon Details</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <table class="table table-dark table-hover">
+                                            <tbody>
+                                                <tr>
+                                                    <th class="stat-label">Weapon Name</th>
+                                                    <td><?php echo htmlspecialchars($cleanWeaponName); ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="stat-label">ID</th>
+                                                    <td><?php echo $weapon['item_id']; ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="stat-label">Type</th>
+                                                    <td><?php echo normalizeText($weapon['type']); ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="stat-label">Grade</th>
+                                                    <td><?php echo $weapon['itemGrade']; ?></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        
+                        <?php if ($is_in_droplist || $is_in_weapon_skill): ?>
+                        <div class="card mb-4">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0">Dependencies Found</h5>
+                            </div>
+                            <div class="card-body">
+                                <?php if ($is_in_droplist): ?>
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>This weapon appears in <?php echo $drop_count; ?> monster drop tables.</strong>
+                                    <p class="mt-2 mb-0">You can choose to remove these entries when deleting the weapon.</p>
+                                </div>
+                                <?php endif; ?>
+                                
+                                <?php if ($is_in_weapon_skill): ?>
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                    <strong>This weapon is associated with weapon skills.</strong>
+                                    <p class="mt-2 mb-0">You must remove these associations before deleting the weapon.</p>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                        
+                        <div class="alert alert-danger">
+                            <h5 class="text-center mb-3">Warning: Delete Confirmation</h5>
+                            <p>You are about to permanently delete this weapon. This action cannot be undone.</p>
+                            
+                            <?php if (!$is_in_droplist && !$is_in_weapon_skill): ?>
+                            <p>Before proceeding, please confirm that this weapon is not:</p>
+                            <ul>
+                                <li>Referenced in quests or other game systems</li>
+                                <li>Currently equipped by players in the game</li>
+                            </ul>
+                            <?php else: ?>
+                            <p>Deleting a weapon that is still in use may cause game issues.</p>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <form action="" method="POST">
+                            <?php if ($is_in_droplist): ?>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="remove_from_droplist" name="remove_from_droplist" value="yes">
+                                    <label class="form-check-label" for="remove_from_droplist">
+                                        <strong>Remove this weapon from all monster drop tables (<?php echo $drop_count; ?> entries)</strong>
+                                    </label>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+                                <a href="weapon_list.php" class="btn btn-outline-light">Cancel</a>
+                                <button type="submit" name="confirm_delete" value="yes" class="btn btn-danger" <?php echo $is_in_weapon_skill ? 'disabled' : ''; ?>>
+                                    Delete Weapon
+                                </button>
+                            </div>
+                            
+                            <?php if ($is_in_weapon_skill): ?>
+                            <div class="text-center mt-3">
+                                <small class="text-warning">The delete button is disabled because this weapon has weapon skill associations.</small>
+                            </div>
+                            <?php endif; ?>
+                        </form>
                     </div>
                 </div>
             </div>

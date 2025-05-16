@@ -117,38 +117,165 @@ if ($weapon_skill_result) {
 
 // Process deletion request
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['confirm_delete'])) {
-    $remove_from_droplist = isset($_POST['remove_from_droplist']) && $_POST['remove_from_droplist'] == 'yes';
+    // Start transaction for comprehensive deletion
+    $conn->begin_transaction();
+    $success = true;
+    $message_details = [];
     
-    // If the weapon is in droplist and we don't want to remove it, or if it's in weapon_skill
-    // then we should not proceed with deletion
-    if (($is_in_droplist && !$remove_from_droplist) || $is_in_weapon_skill) {
-        $_SESSION['message'] = "Cannot delete this weapon because it has dependencies that weren't addressed.";
-        if ($is_in_droplist && !$remove_from_droplist) {
-            $_SESSION['message'] .= " Remove it from the droplist first.";
-        }
-        if ($is_in_weapon_skill) {
-            $_SESSION['message'] .= " It is associated with weapon skills.";
-        }
-        $_SESSION['message_type'] = "danger";
-    } else {
-        // Proceed with deletion
-        list($success, $details) = deleteWeaponAndDependencies($conn, $weapon_id, $remove_from_droplist);
+    try {
+        // Get dependency counts for reporting and delete related records
         
-        if ($success) {
-            $_SESSION['message'] = implode(", ", $details);
-            $_SESSION['message_type'] = "success";
+        // 1. Check and delete from droplist table (uses itemId)
+        $count_droplist_sql = "SELECT COUNT(*) as count FROM droplist WHERE itemId = ?";
+        $count_stmt = $conn->prepare($count_droplist_sql);
+        if ($count_stmt) {
+            $count_stmt->bind_param("i", $weapon_id);
+            $count_stmt->execute();
+            $result = $count_stmt->get_result();
+            $row = $result->fetch_assoc();
+            $count = $row['count'];
+            $count_stmt->close();
             
-            // Log the activity
-            if (function_exists('logAdminActivity')) {
-                logAdminActivity('delete', 'weapon', "Deleted weapon with ID: $weapon_id");
+            if ($count > 0) {
+                $delete_sql = "DELETE FROM droplist WHERE itemId = ?";
+                $delete_stmt = $conn->prepare($delete_sql);
+                $delete_stmt->bind_param("i", $weapon_id);
+                $delete_stmt->execute();
+                
+                if ($delete_stmt->affected_rows > 0) {
+                    $message_details[] = "Removed $count monster drop entries";
+                }
+                $delete_stmt->close();
             }
-            
-            header("Location: weapon_list.php");
-            exit;
-        } else {
-            $_SESSION['message'] = "Error: " . implode(", ", $details);
-            $_SESSION['message_type'] = "danger";
         }
+        
+        // 2. Check and delete from weapon_skill table (uses weapon_id)
+        $count_skill_sql = "SELECT COUNT(*) as count FROM weapon_skill WHERE weapon_id = ?";
+        $count_stmt = $conn->prepare($count_skill_sql);
+        if ($count_stmt) {
+            $count_stmt->bind_param("i", $weapon_id);
+            $count_stmt->execute();
+            $result = $count_stmt->get_result();
+            $row = $result->fetch_assoc();
+            $count = $row['count'];
+            $count_stmt->close();
+            
+            if ($count > 0) {
+                $delete_sql = "DELETE FROM weapon_skill WHERE weapon_id = ?";
+                $delete_stmt = $conn->prepare($delete_sql);
+                $delete_stmt->bind_param("i", $weapon_id);
+                $delete_stmt->execute();
+                
+                if ($delete_stmt->affected_rows > 0) {
+                    $message_details[] = "Removed $count weapon skill associations";
+                }
+                $delete_stmt->close();
+            }
+        }
+        
+        // 3. Check if weapon_skill_model exists and has item_id column before attempting operations
+        $table_exists = $conn->query("SHOW TABLES LIKE 'weapon_skill_model'")->num_rows > 0;
+        if ($table_exists) {
+            // Check if the column exists
+            $column_exists = $conn->query("SHOW COLUMNS FROM weapon_skill_model LIKE 'item_id'")->num_rows > 0;
+            
+            if ($column_exists) {
+                $count_model_sql = "SELECT COUNT(*) as count FROM weapon_skill_model WHERE item_id = ?";
+                $count_stmt = $conn->prepare($count_model_sql);
+                if ($count_stmt) {
+                    $count_stmt->bind_param("i", $weapon_id);
+                    $count_stmt->execute();
+                    $result = $count_stmt->get_result();
+                    $row = $result->fetch_assoc();
+                    $count = $row['count'];
+                    $count_stmt->close();
+                    
+                    if ($count > 0) {
+                        $delete_sql = "DELETE FROM weapon_skill_model WHERE item_id = ?";
+                        $delete_stmt = $conn->prepare($delete_sql);
+                        $delete_stmt->bind_param("i", $weapon_id);
+                        $delete_stmt->execute();
+                        
+                        if ($delete_stmt->affected_rows > 0) {
+                            $message_details[] = "Removed $count weapon skill models";
+                        }
+                        $delete_stmt->close();
+                    }
+                }
+            }
+        }
+        
+        // 4. Check if weapon_damege exists and check the correct column name
+        $table_exists = $conn->query("SHOW TABLES LIKE 'weapon_damege'")->num_rows > 0;
+        if ($table_exists) {
+            // Check for both possible column names: 'item_id' or 'weapon_id'
+            $item_id_exists = $conn->query("SHOW COLUMNS FROM weapon_damege LIKE 'item_id'")->num_rows > 0;
+            $weapon_id_exists = $conn->query("SHOW COLUMNS FROM weapon_damege LIKE 'weapon_id'")->num_rows > 0;
+            
+            $column_name = $item_id_exists ? 'item_id' : ($weapon_id_exists ? 'weapon_id' : '');
+            
+            if (!empty($column_name)) {
+                $count_damage_sql = "SELECT COUNT(*) as count FROM weapon_damege WHERE $column_name = ?";
+                $count_stmt = $conn->prepare($count_damage_sql);
+                if ($count_stmt) {
+                    $count_stmt->bind_param("i", $weapon_id);
+                    $count_stmt->execute();
+                    $result = $count_stmt->get_result();
+                    $row = $result->fetch_assoc();
+                    $count = $row['count'];
+                    $count_stmt->close();
+                    
+                    if ($count > 0) {
+                        $delete_sql = "DELETE FROM weapon_damege WHERE $column_name = ?";
+                        $delete_stmt = $conn->prepare($delete_sql);
+                        $delete_stmt->bind_param("i", $weapon_id);
+                        $delete_stmt->execute();
+                        
+                        if ($delete_stmt->affected_rows > 0) {
+                            $message_details[] = "Removed $count weapon damage records";
+                        }
+                        $delete_stmt->close();
+                    }
+                }
+            }
+        }
+        
+        // Finally delete the weapon itself
+        $delete_weapon_sql = "DELETE FROM weapon WHERE item_id = ?";
+        $delete_weapon_stmt = $conn->prepare($delete_weapon_sql);
+        $delete_weapon_stmt->bind_param("i", $weapon_id);
+        $delete_weapon_stmt->execute();
+        
+        if ($delete_weapon_stmt->affected_rows > 0) {
+            $message_details[] = "Weapon deleted successfully";
+            $success = true;
+        } else {
+            // If weapon wasn't deleted, rollback
+            throw new Exception("Failed to delete weapon");
+        }
+        
+        $delete_weapon_stmt->close();
+        
+        // If we got this far, commit the transaction
+        $conn->commit();
+        
+        // Set success message
+        $_SESSION['message'] = implode(", ", $message_details);
+        $_SESSION['message_type'] = "success";
+        
+        // Log the activity
+        if (function_exists('logAdminActivity')) {
+            logAdminActivity('delete', 'weapon', "Deleted weapon with ID: $weapon_id and all its associations");
+        }
+        
+        header("Location: weapon_list.php");
+        exit;
+        
+    } catch (Exception $e) {
+        // Something went wrong, rollback
+        $conn->rollback();
+        $_SESSION['message'] = "Error: " . $e->getMessage();
+        $_SESSION['message_type'] = "danger";
     }
 }
 
@@ -240,70 +367,97 @@ include '../../../includes/admin_header.php';
                             </div>
                         </div>
                         
-                        <?php if ($is_in_droplist || $is_in_weapon_skill): ?>
+                        <?php 
+                        // Get dependency counts for information - More robust version
+                        $dependencies = [];
+                        
+                        // Check droplist
+                        $check_droplist_sql = "SELECT COUNT(*) as count FROM droplist WHERE itemId = $weapon_id";
+                        $droplist_result = $conn->query($check_droplist_sql);
+                        if ($droplist_result && $droplist_result->num_rows > 0) {
+                            $droplist_row = $droplist_result->fetch_assoc();
+                            $drop_count = $droplist_row['count'];
+                            if ($drop_count > 0) {
+                                $dependencies[] = "$drop_count monster drop table entries";
+                            }
+                        }
+                        
+                        // Check weapon skills
+                        $check_skill_sql = "SELECT COUNT(*) as count FROM weapon_skill WHERE weapon_id = $weapon_id";
+                        $skill_result = $conn->query($check_skill_sql);
+                        if ($skill_result && $skill_result->num_rows > 0) {
+                            $skill_row = $skill_result->fetch_assoc();
+                            if ($skill_row['count'] > 0) {
+                                $dependencies[] = $skill_row['count'] . " weapon skill associations";
+                            }
+                        }
+                        
+                        // Check weapon skill model - Check if table and column exist
+                        $table_exists = $conn->query("SHOW TABLES LIKE 'weapon_skill_model'")->num_rows > 0;
+                        if ($table_exists) {
+                            $column_exists = $conn->query("SHOW COLUMNS FROM weapon_skill_model LIKE 'item_id'")->num_rows > 0;
+                            if ($column_exists) {
+                                $check_model_sql = "SELECT COUNT(*) as count FROM weapon_skill_model WHERE item_id = $weapon_id";
+                                $model_result = $conn->query($check_model_sql);
+                                if ($model_result && $model_result->num_rows > 0) {
+                                    $model_row = $model_result->fetch_assoc();
+                                    if ($model_row['count'] > 0) {
+                                        $dependencies[] = $model_row['count'] . " weapon skill models";
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Check weapon damage - Check if table exists and find the right column
+                        $table_exists = $conn->query("SHOW TABLES LIKE 'weapon_damege'")->num_rows > 0;
+                        if ($table_exists) {
+                            $item_id_exists = $conn->query("SHOW COLUMNS FROM weapon_damege LIKE 'item_id'")->num_rows > 0;
+                            $weapon_id_exists = $conn->query("SHOW COLUMNS FROM weapon_damege LIKE 'weapon_id'")->num_rows > 0;
+                            
+                            $column_name = $item_id_exists ? 'item_id' : ($weapon_id_exists ? 'weapon_id' : '');
+                            
+                            if (!empty($column_name)) {
+                                $check_damage_sql = "SELECT COUNT(*) as count FROM weapon_damege WHERE $column_name = $weapon_id";
+                                $damage_result = $conn->query($check_damage_sql);
+                                if ($damage_result && $damage_result->num_rows > 0) {
+                                    $damage_row = $damage_result->fetch_assoc();
+                                    if ($damage_row['count'] > 0) {
+                                        $dependencies[] = $damage_row['count'] . " weapon damage records";
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if (count($dependencies) > 0): 
+                        ?>
                         <div class="card mb-4">
                             <div class="card-header bg-warning text-dark">
-                                <h5 class="mb-0">Dependencies Found</h5>
+                                <h5 class="mb-0">The following related data will also be deleted:</h5>
                             </div>
                             <div class="card-body">
-                                <?php if ($is_in_droplist): ?>
-                                <div class="alert alert-warning">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                    <strong>This weapon appears in <?php echo $drop_count; ?> monster drop tables.</strong>
-                                    <p class="mt-2 mb-0">You can choose to remove these entries when deleting the weapon.</p>
-                                </div>
-                                <?php endif; ?>
-                                
-                                <?php if ($is_in_weapon_skill): ?>
-                                <div class="alert alert-danger">
-                                    <i class="fas fa-exclamation-circle me-2"></i>
-                                    <strong>This weapon is associated with weapon skills.</strong>
-                                    <p class="mt-2 mb-0">You must remove these associations before deleting the weapon.</p>
-                                </div>
-                                <?php endif; ?>
+                                <ul class="mb-0">
+                                    <?php foreach($dependencies as $dependency): ?>
+                                    <li><strong><?php echo $dependency; ?></strong></li>
+                                    <?php endforeach; ?>
+                                </ul>
                             </div>
                         </div>
                         <?php endif; ?>
                         
-                        <div class="alert alert-danger">
-                            <h5 class="text-center mb-3">Warning: Delete Confirmation</h5>
-                            <p>You are about to permanently delete this weapon. This action cannot be undone.</p>
-                            
-                            <?php if (!$is_in_droplist && !$is_in_weapon_skill): ?>
-                            <p>Before proceeding, please confirm that this weapon is not:</p>
-                            <ul>
-                                <li>Referenced in quests or other game systems</li>
-                                <li>Currently equipped by players in the game</li>
-                            </ul>
-                            <?php else: ?>
-                            <p>Deleting a weapon that is still in use may cause game issues.</p>
-                            <?php endif; ?>
-                        </div>
-                        
                         <form action="" method="POST">
-                            <?php if ($is_in_droplist): ?>
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="remove_from_droplist" name="remove_from_droplist" value="yes">
-                                    <label class="form-check-label" for="remove_from_droplist">
-                                        <strong>Remove this weapon from all monster drop tables (<?php echo $drop_count; ?> entries)</strong>
-                                    </label>
-                                </div>
+                            <div class="alert alert-danger">
+                                <h5 class="text-center mb-3">Warning: Delete Confirmation</h5>
+                                <p><strong>You are about to permanently delete this weapon and ALL its associated data.</strong></p>
+                                <p>This action cannot be undone and will remove all related entries from other database tables.</p>
+                                <p>Please confirm that this weapon is not currently equipped by players in the game.</p>
                             </div>
-                            <?php endif; ?>
                             
                             <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
                                 <a href="weapon_list.php" class="btn btn-outline-light">Cancel</a>
-                                <button type="submit" name="confirm_delete" value="yes" class="btn btn-danger" <?php echo $is_in_weapon_skill ? 'disabled' : ''; ?>>
-                                    Delete Weapon
+                                <button type="submit" name="confirm_delete" value="yes" class="btn btn-danger">
+                                    Delete Weapon and All Related Data
                                 </button>
                             </div>
-                            
-                            <?php if ($is_in_weapon_skill): ?>
-                            <div class="text-center mt-3">
-                                <small class="text-warning">The delete button is disabled because this weapon has weapon skill associations.</small>
-                            </div>
-                            <?php endif; ?>
                         </form>
                     </div>
                 </div>

@@ -1247,3 +1247,49 @@ footer {
         height: 70px;
     }
 }
+
+/* Card spacing fix for weapon_detail.php */
+
+/* Add margin between stacked cards in the same column */
+.card + .card {
+  margin-top: 2rem !important;
+}
+
+/* Fix for combat stats cards */
+.stat-btn.card {
+  margin-bottom: 1rem;
+  height: auto;
+}
+
+/* Fix cursor on informational cards */
+.card:not(.clickable-row):not(.stat-btn) {
+  cursor: default;
+}
+
+/* Fix for the weapon image card container */
+.weapon-image-container {
+  min-height: 320px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Ensure cards don't stretch beyond their content */
+.card-body {
+  height: auto;
+}
+
+/* Add spacing between sections */
+.section-row + .section-row {
+  margin-top: 2rem;
+}
+
+/* Fix padding for nested card elements */
+.card .card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Better fit for class icon containers */
+.class-restrictions .col-4 {
+  padding: 0.5rem;
+}
